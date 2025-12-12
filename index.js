@@ -3,10 +3,16 @@ const app= express();
 const port = 8080;
 const mongoose= require("mongoose");
 const path= require("path");
+const ejsmate=require("ejs-mate");
+
 app.set("views", path.join(__dirname,"views"));
 app.set("view engine","ejs");
-app.use(express.static(path.join(__dirname,"public")));
+app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({extended : true}));
+app.engine('ejs', ejsmate);
+
+const methodoverride= require("method-override");
+app.use(methodoverride("_method"));
 
 const Listing = require("./models/listing.js");
 
@@ -65,7 +71,23 @@ app.post("/listings", async(req,res)=>{
     await newListing.save();
     res.redirect("/listings");
 })
-
+//Edit
+app.get("/listings/:id/edit",async (req,res)=>{
+     let {id}=req.params;
+    const listing= await Listing.findById(id);
+    res.render("./listings/edit.ejs",{listing});
+})
+app.put("/listings/:id",async(req,res)=>{
+    let {id}= req.params;
+    await Listing.findByIdAndUpdate(id, {...req.body.listing});
+    res.redirect("/listings");
+});
+app.delete("/listings/:id",async(req,res)=>{
+    let {id}=req.params;
+   let deletedata= await Listing.findByIdAndDelete(id);
+   console.log(deletedata);
+    res.redirect("/listings");
+})
 
 app.listen(port,()=>{
     console.log(`port is listening ${port}`);
