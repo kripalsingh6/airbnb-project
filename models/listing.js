@@ -18,7 +18,7 @@ const listingSchema= new schema({
       type: String,
       default: "https://unsplash.com/photos/gray-wooden-house-178j8tJrNlc",
       set: (v) =>
-        v.trim() === ""
+        v.trim() === " "
           ? "https://unsplash.com/photos/gray-wooden-house-178j8tJrNlc"
           : v,
     },
