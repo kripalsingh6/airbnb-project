@@ -33,10 +33,15 @@
    <div class="col-8 offset-3">
     <hr>
     <h4>leave a review</h4>
-    <form action="/listings/<%= listing._id %>/reviews" method="post" class="mb-3 mt-3">
+    <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
         <div class="mb-3 mt-3">
             <label for="rating" class="form-label" >Rating</label>
-            <input type="range" min="1" max="5" id="rating" name="review[rating]" class="form-range">
+            <input type="range"
+             min="1" 
+             max="5" 
+             id="rating"
+             name="review[rating]"
+             class="form-range">
         </div>
         <div class="mb-3 mt-3">
             <label for="comment" class="form-label">Comments</label>
@@ -45,11 +50,22 @@
             cols="30" 
             rows="5" 
             class="form-control"
+            required
             ></textarea>
+            <div class="invalid-feedback">
+                please add some comments for review 
+            </div>
         </div>
         <button class="btn btn-outline-dark">Submit</button>
     </form>
-
+     <hr>
+     <h4>All Reviews</h4>
+     <ul>
+        <% for(let review of listing.reviews){ %>
+            <li><%= reviews.comment %> ,<%= reviews.rating %> star</li>
+            <% } %>
+     </ul>
    </div>
+   
 </div>
 </body>
