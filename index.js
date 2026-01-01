@@ -18,6 +18,8 @@ const methodoverride= require("method-override");
 app.use(methodoverride("_method"));
 
 const Listing = require("./models/listing.js");
+const Review= require("./models/review.js");
+const { AsyncLocalStorage } = require("async_hooks");
 
 main()
 .then(()=>{
@@ -105,6 +107,21 @@ app.delete("/listings/:id",
    console.log(deletedata);
     res.redirect("/listings");
 }));
+
+// review 
+// post request
+
+app.post("/listings/:id/reviews", async (req , res)=>{
+  let listing= await Listing.findById(req.params.id);
+  let newreview= new Review(req.body.review);
+
+   listing.review.push(newreview);
+
+  await newreview.save();
+  await listing.save();
+
+  res.redirect(`/listings/${listing._id}`);
+});
 
 app.all(/.*/,(req,res,next)=>{
     next(new ExpressError(404,"Page not found"))
