@@ -59,12 +59,21 @@
         <button class="btn btn-outline-dark">Submit</button>
     </form>
      <hr>
-     <h4>All Reviews</h4>
-     <ul>
+     <li class="mb-2"><b>All Reviews</b></li>
+     <div class="row">
         <% for(let review of listing.reviews){ %>
-            <li><%= reviews.comment %> ,<%= reviews.rating %> star</li>
-            <% } %>
-     </ul>
+            <div class="card col-5 mb-3 ms-3">
+             <div class="card-body">
+                <h5 class="card-title mt-3">john mark</h5>
+                <p class="card-text"><%= review.comment %></p>
+                 <p class="card-text"><%= review.rating %>&#9733</p>
+                 <form method="post" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                    <button class="btn btn-outline-dark mb-3"><i class="fa-solid fa-trash-can"></i></button>
+                 </form>
+            </div>
+            </div>
+             <% } %>
+        </div>
    </div>
    
 </div>
