@@ -7,6 +7,8 @@ const ejsmate=require("ejs-mate");
 const ExpressError = require("./utils/expressError.js");
 const listings = require("./route/listings.js");
 const reviews = require("./route/review.js");
+const session= require("express-session");
+const flash= require("connect-flash");
 
 app.set("views", path.join(__dirname,"views"));
 app.set("view engine","ejs");
@@ -28,6 +30,19 @@ console.log("mongodb connected");
 async function main() {
     await mongoose.connect("mongodb://127.0.0.1:27017/Project");
 }
+
+let sessionsoption= {secret : "mysupersecretstring", 
+    resave: false ,
+    saveUninitialized : true,
+    cookie: {
+        expires:Date.now()+ 7*24*60*60*1000,
+        maxAge: 7*24*60*60*1000,
+        httpOnly: true
+    }
+};
+
+app.use(session(sessionsoption));
+app.use(flash());
 
 app.get("/",(req, res)=>{
     res.send("Working");
