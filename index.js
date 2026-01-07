@@ -9,6 +9,9 @@ const listings = require("./route/listings.js");
 const reviews = require("./route/review.js");
 const session= require("express-session");
 const flash= require("connect-flash");
+const passport= require("passport");
+const locatStrategy= require("passport-local");
+const User= require("./models/user.js");
 
 app.set("views", path.join(__dirname,"views"));
 app.set("view engine","ejs");
@@ -44,11 +47,28 @@ let sessionsoption= {secret : "mysupersecretstring",
 app.use(session(sessionsoption));
 app.use(flash());
 
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
 app.use((req,res,next)=>{
     res.locals.success = req.flash("success");
     res.locals.error = req.flash("error");
     next();
 });
+
+app.get("/fakeuser", async (req,res)=>{
+    let fakeuser= new User({
+        email : "student@gmail.com",
+        username: "college-student"
+    });
+
+   let registereduser=await User.register(fakeuser,"helloworld");
+   res.send(registereduser);
+})
 
 app.get("/",(req, res)=>{
     res.send("Working");
