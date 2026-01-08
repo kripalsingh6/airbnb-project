@@ -5,12 +5,13 @@ const mongoose= require("mongoose");
 const path= require("path");
 const ejsmate=require("ejs-mate");
 const ExpressError = require("./utils/expressError.js");
-const listings = require("./route/listings.js");
-const reviews = require("./route/review.js");
+const listingRouter = require("./route/listings.js");
+const reviewRouter = require("./route/review.js");
+const userRouter = require("./route/user.js");
 const session= require("express-session");
 const flash= require("connect-flash");
 const passport= require("passport");
-const locatStrategy= require("passport-local");
+const LocalStrategy= require("passport-local");
 const User= require("./models/user.js");
 
 app.set("views", path.join(__dirname,"views"));
@@ -60,21 +61,23 @@ app.use((req,res,next)=>{
     next();
 });
 
-app.get("/fakeuser", async (req,res)=>{
-    let fakeuser= new User({
-        email : "student@gmail.com",
-        username: "college-student"
-    });
+// app.get("/fakeuser", async (req,res)=>{
+//     let fakeuser= new User({
+//         email : "student@gmail.com",
+//         username: "college-student"
+//     });
 
-   let registereduser=await User.register(fakeuser,"helloworld");
-   res.send(registereduser);
-})
+//    let registereduser=await User.register(fakeuser,"helloworld");
+//    res.send(registereduser);
+// });
 
 app.get("/",(req, res)=>{
     res.send("Working");
 });
-app.use("/listings",listings);
-app.use("/listings/:id/reviews",reviews);
+app.use("/listings",listingRouter);
+app.use("/listings/:id/reviews",reviewRouter);
+app.use("/", userRouter)
+
 
 app.all(/.*/,(req,res,next)=>{
     next(new ExpressError(404,"Page not found"))
