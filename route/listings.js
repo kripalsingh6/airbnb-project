@@ -3,6 +3,7 @@ const router= express.Router();
 const wrapAsync= require("../utils/wrapAsync.js");
 const Listing = require("../models/listing.js");
 const {isLoggedIn, isOwner,validateListing} = require("../middleware.js");
+const { populate } = require("../models/review.js");
 
 
 
@@ -22,7 +23,7 @@ router.get("/new", isLoggedIn,(req, res)=>{
 
 router.get("/:id",wrapAsync(async(req, res)=>{
     let {id}=req.params;
-    const listing= await Listing.findById(id).populate("reviews").populate("owner");
+    const listing= await Listing.findById(id).populate( {path :"reviews",populate:{path :"author"}}).populate("owner");
     if(!listing){
         req.flash("error", "Listing requesting does not exist");
        return  res.redirect("/listings")
