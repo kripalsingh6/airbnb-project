@@ -34,3 +34,18 @@ module.exports.renderEditForm=async (req,res)=>{
     }
     res.render("./listings/edit.ejs",{listing});
 };
+
+module.exports.editListing=async(req,res)=>{
+    let {id}= req.params;
+    await Listing.findByIdAndUpdate(id, {...req.body.listing});
+     req.flash("success", "listing updated");
+      return res.redirect("/listings");
+};
+
+module.exports.Deletelisting=async(req,res)=>{
+    let {id}=req.params;
+   let deletedata= await Listing.findByIdAndDelete(id);
+   console.log(deletedata);
+    req.flash("success", "listing Deleted");
+    res.redirect("/listings");
+};
