@@ -1,116 +1,600 @@
 <% layout("/layout/boilerplate") -%>
 <body>
-    <div class="row">
-    <div class="col-8 offset-3 mt-3">
-      <h3><%= listing.title %></h3>
+  <div class="show-container">
+    <!-- Header -->
+    <div class="show-title-header">
+      <h2><%= listing.title %></h2>
+      <div class="show-subtitle">
+        <span><i class="fa-solid fa-location-dot text-danger me-1"></i><%= listing.location %>, <%= listing.country %></span>
+        <span>&bull;</span>
+        <span><i class="fa-solid fa-star text-warning me-1"></i>4.88 (Reviews)</span>
+        <span>&bull;</span>
+        <span><i class="fa-solid fa-user-group text-muted me-1"></i>Max 2 adults per room</span>
       </div>
-     <div class="card col-6 offset-3 show-card">
-         <img src="<%= listing.image.url %>" 
-         class="card-img-top show-img" 
-         alt="listing_image">
+    </div>
 
-         <div class="card-body">
-         <p class="card-text">
-            <p>Owned By  <i><%= listing.title %></i></p>
-           <%= listing.description  %><br>
-           &#8377; <%= listing.price.toLocaleString("en-IN")  %><br>
-           <%= listing.location  %><br>
-           <%= listing.country  %><br>
-        </p>
-         </div>
-     </div>
-     <br/>
-     
-    <% if(currUser && listing.owner._id.equals(currUser._id)){ %>
-    <div class="btns mt-3">
-        <a href="/listings/<%= listing._id %>/edit" 
-            class="btn btn-dark col-2 offset-3 add-btn">
-            Edit</a>
-   
-   <form method="post" action="/listings/<%= listing._id %>?_method=DELETE">
-    <button class="btn btn-dark offset-5" >Delete</button>
-   </form>
-   </div>
-    <% } %>
-   <div class="col-8 offset-3">
-    
-    
-    <% if(currUser){ %>
-    <h4 class="mt-3">leave a review</h4>
-    <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
-        
-        <!-- <div class="mb-3 mt-3">
-            <label for="rating" class="form-label" >Rating</label>
-            <input type="range"
-             min="1" 
-             max="5" 
-             id="rating"
-             name="review[rating]"
-             class="form-range">
-        </div> -->
-        <div class="mb-3 mt-3">
-            <label for="rating" class="form-label" >Rating</label>
-         <fieldset class="starability-slot">
-       <input type="radio" 
-       id="no-rate" 
-       class="input-no-rate" 
-       name="review[rating]" value="1" 
-       checked aria-label="No rating." />
-      <input type="radio" id="first-rate1" name="review[rating]" value="1" />
-       <label for="first-rate1" title="Terrible">1 star</label>
-       <input type="radio" id="first-rate2" name="review[rating]" value="2" />
-     <label for="first-rate2" title="Not good">2 stars</label>
-     <input type="radio" id="first-rate3" name="review[rating]" value="3" />
-     <label for="first-rate3" title="Average">3 stars</label>
-     <input type="radio" id="first-rate4" name="review[rating]" value="4" />
-     <label for="first-rate4" title="Very good">4 stars</label>
-     <input type="radio" id="first-rate5" name="review[rating]" value="5" />
-    <label for="first-rate5" title="Amazing">5 stars</label>
-     </fieldset>
-     </div>
-        <div class="mb-3 mt-3">
-            <label for="comment" class="form-label">Comments</label>
-            <textarea name="review[comment]" 
-            id="comment" 
-            cols="30" 
-            rows="5" 
-            class="form-control"
-            required
-            ></textarea>
-            <div class="invalid-feedback">
-                please add some comments for review 
-            </div>
+    <!-- Hero Image -->
+    <div class="show-img-wrapper">
+      <img 
+        src="<%= listing.image && listing.image.url ? listing.image.url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=60' %>" 
+        class="show-img" 
+        alt="<%= listing.title %>"
+      >
+    </div>
+
+    <!-- Host Information Data Setup -->
+    <% 
+      const hostName = (listing.owner && listing.owner.username) ? listing.owner.username : 'Anonymous Host';
+      const hostBadges = [
+        'Superhost &bull; 4 years hosting',
+        'Superhost &bull; Fast response rate',
+        'Experienced Host &bull; Highly rated',
+        'Superhost &bull; Responds within an hour',
+        'Verified Host &bull; Top hospitality'
+      ];
+      const avatarColors = ['#fe424d', '#2563eb', '#059669', '#7c3aed', '#d97706', '#db2777', '#0891b2', '#4f46e5'];
+      let hostCharSum = 0;
+      for (let i = 0; i < hostName.length; i++) {
+        hostCharSum += hostName.charCodeAt(i);
+      }
+      const hostBadge = hostBadges[hostCharSum % hostBadges.length];
+      const avatarBg = avatarColors[hostCharSum % avatarColors.length];
+    %>
+
+    <!-- Main Two-Column Layout: Left Content Scrolls, Right Card is Sticky -->
+    <div class="row gx-lg-5 mt-4">
+      <!-- LEFT COLUMN: All Listing Details & Scrollable Content -->
+      <div class="col-lg-7 col-xl-8 pe-lg-4">
+
+        <!-- Subheader Property Specs (Airbnb Style) -->
+        <div class="pb-3 border-bottom mb-4">
+          <h4 class="fw-bold mb-1"><%= listing.propertyType || 'Entire home' %> in <%= listing.location %>, <%= listing.country %></h4>
+          <div class="text-secondary small mb-2">
+            <span><%= listing.guests || 2 %> guests</span> &bull; 
+            <span><%= listing.bedrooms || 1 %> bedroom<%= (listing.bedrooms && listing.bedrooms > 1) ? 's' : '' %></span> &bull; 
+            <span><%= listing.beds || 1 %> bed<%= (listing.beds && listing.beds > 1) ? 's' : '' %></span> &bull; 
+            <span><%= listing.bathrooms || 1 %> bathroom<%= (listing.bathrooms && listing.bathrooms > 1) ? 's' : '' %></span>
+          </div>
+          <div class="small fw-semibold text-dark">
+            <i class="fa-solid fa-star text-warning me-1"></i>4.88 &bull; <span class="text-decoration-underline"><%= (listing.reviews && listing.reviews.length > 0) ? listing.reviews.length : 34 %> reviews</span>
+          </div>
         </div>
-        <button class="btn btn-outline-dark">Submit</button>
-    </form>
-    <% } %>
-     <hr>
-     
-     <div class="row">
-        <% if(listing.reviews.length>0){ %>
-        <li class="mb-2"><b>All Reviews</b></li>
-        <% for(let review of listing.reviews){ %>
-            <div class="card col-5 mb-3 ms-3">
-             <div class="card-body">
-                <h5 class="card-title mt-3">@<%= review.author.username  %></h5>
-                 <p class="starability-result" data-rating="<%= review.rating %>">
-                  </p>
-                <p class="card-text"><%= review.comment %></p>
-                 <form method="post" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
-                    <button class="btn btn-outline-dark mb-3"><i class="fa-solid fa-trash-can"></i></button>
-                 </form>
+
+        <!-- Host Information Section -->
+        <div class="d-flex align-items-center gap-3 pb-4 border-bottom mb-4">
+          <div class="position-relative">
+            <div class="host-avatar-lg" style="background-color: <%= avatarBg %>; width: 56px; height: 56px; font-size: 1.4rem;">
+              <%= hostName.charAt(0).toUpperCase() %>
             </div>
-            </div>
-             <% } %>
+            <span class="position-absolute bottom-0 end-0 bg-danger text-white rounded-circle d-flex align-items-center justify-content-center border border-white" style="width: 20px; height: 20px; font-size: 0.65rem;" title="Superhost">
+              <i class="fa-solid fa-award"></i>
+            </span>
+          </div>
+          <div>
+            <h6 class="fw-bold mb-0 fs-5">Hosted by <%= hostName %></h6>
+            <span class="text-muted small"><%- hostBadge %></span>
+          </div>
         </div>
+
+        <!-- Airbnb Key Perks Highlights (Matches User's Reference UI) -->
+        <div class="pb-4 border-bottom mb-4">
+          <div class="highlight-item">
+            <div class="highlight-icon">
+              <i class="fa-solid fa-door-open"></i>
+            </div>
+            <div>
+              <div class="fw-bold fs-6">Self check-in</div>
+              <div class="text-muted small">You can check in with the building staff or keypad.</div>
+            </div>
+          </div>
+
+          <div class="highlight-item">
+            <div class="highlight-icon">
+              <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <div>
+              <div class="fw-bold fs-6">Outdoor entertainment</div>
+              <div class="text-muted small">The alfresco dining and outdoor seating are great for summer trips.</div>
+            </div>
+          </div>
+
+          <div class="highlight-item mb-0">
+            <div class="highlight-icon">
+              <i class="fa-solid fa-fan"></i>
+            </div>
+            <div>
+              <div class="fw-bold fs-6">Designed for staying cool</div>
+              <div class="text-muted small">Beat the heat with the A/C, portable fan and ceiling fan.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description / The space -->
+        <div class="pb-4 border-bottom mb-4">
+          <h5 class="fw-bold mb-3">The space</h5>
+          <p class="listing-description text-secondary mb-0" style="white-space: pre-line; line-height: 1.7;">
+            <%= listing.description %>
+          </p>
+        </div>
+
+        <!-- What this place offers (Amenities Section) -->
+        <div class="amenities-section pb-4 border-bottom mb-4">
+          <h4 class="fw-bold mb-4">What this place offers</h4>
+          <div class="row g-3">
+            <% if(listing.amenities && listing.amenities.length > 0) { %>
+              <% for(let amenity of listing.amenities) { %>
+                <div class="col-md-6 col-12">
+                  <div class="d-flex align-items-center py-2 amenity-item">
+                    <% if(amenity.available) { %>
+                      <div class="me-3 d-flex align-items-center justify-content-center text-dark" style="width: 28px; height: 28px;">
+                        <i class="<%= amenity.icon || 'fa-solid fa-check' %> fs-5"></i>
+                      </div>
+                      <span class="fs-6 text-dark"><%= amenity.name %></span>
+                    <% } else { %>
+                      <div class="me-3 d-flex align-items-center justify-content-center text-muted" style="width: 28px; height: 28px;">
+                        <i class="<%= amenity.icon || 'fa-solid fa-ban' %> fs-5"></i>
+                      </div>
+                      <span class="fs-6 text-muted text-decoration-line-through">
+                        Unavailable: <%= amenity.name %>
+                      </span>
+                    <% } %>
+                  </div>
+                </div>
+              <% } %>
+            <% } %>
+          </div>
+
+          <% if(listing.amenities && listing.amenities.length > 8) { %>
+            <div class="mt-4">
+              <button type="button" class="btn btn-outline-dark rounded-3 px-4 py-2 fw-semibold" data-bs-toggle="modal" data-bs-target="#allAmenitiesModal">
+                Show all <%= listing.amenities.length %> amenities
+              </button>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Owner Actions (If logged in as owner) -->
+        <% if(currUser && listing.owner && listing.owner._id.equals(currUser._id)){ %>
+          <div class="show-action-btns pb-4 border-bottom mb-4">
+            <a href="/listings/<%= listing._id %>/edit" class="btn btn-brand">
+              <i class="fa-solid fa-pen-to-square me-1"></i> Edit Listing
+            </a>
+            <form method="post" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
+              <button class="btn btn-outline-dark" onclick="return confirm('Are you sure you want to delete this listing?')">
+                <i class="fa-solid fa-trash-can me-1"></i> Delete
+              </button>
+            </form>
+          </div>
         <% } %>
-   </div>
-   <hr>
-   <h3>Where you"ll be </h3>
-   <div class="map">
-    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d948582.195276783!2d77.4058915!3d23.1994097!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1772202778695!5m2!1sen!2sin" width="455" height="450" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
-   </div>
-   
-   
-</div>
+
+        <!-- Review Section -->
+        <div class="reviews-section pb-4 border-bottom mb-4">
+          <h4 class="fw-bold mb-3">
+            <i class="fa-solid fa-star text-warning me-1"></i> 4.88 &bull; <%= (listing.reviews && listing.reviews.length > 0) ? listing.reviews.length : 34 %> reviews
+          </h4>
+
+          <% if(currUser){ %>
+            <div class="card p-3 rounded-4 border bg-light mb-4 shadow-sm">
+              <h5 class="fw-bold mb-3">Leave a Review</h5>
+              <form action="/listings/<%= listing._id %>/reviews" method="post" novalidate class="needs-validation">
+                <div class="mb-3">
+                  <label for="rating" class="form-label small fw-semibold">Rating</label>
+                  <fieldset class="starability-slot">
+                    <input type="radio" id="no-rate" class="input-no-rate" name="review[rating]" value="1" checked aria-label="No rating." />
+                    <input type="radio" id="first-rate1" name="review[rating]" value="1" />
+                    <label for="first-rate1" title="Terrible">1 star</label>
+                    <input type="radio" id="first-rate2" name="review[rating]" value="2" />
+                    <label for="first-rate2" title="Not good">2 stars</label>
+                    <input type="radio" id="first-rate3" name="review[rating]" value="3" />
+                    <label for="first-rate3" title="Average">3 stars</label>
+                    <input type="radio" id="first-rate4" name="review[rating]" value="4" />
+                    <label for="first-rate4" title="Very good">4 stars</label>
+                    <input type="radio" id="first-rate5" name="review[rating]" value="5" />
+                    <label for="first-rate5" title="Amazing">5 stars</label>
+                  </fieldset>
+                </div>
+
+                <div class="mb-3">
+                  <label for="comment" class="form-label small fw-semibold">Comments</label>
+                  <textarea name="review[comment]" id="comment" cols="30" rows="3" class="form-control" placeholder="Share your experience here..." required></textarea>
+                  <div class="invalid-feedback">Please add some comments for your review.</div>
+                </div>
+                <button class="btn btn-dark rounded-pill px-4">Submit Review</button>
+              </form>
+            </div>
+          <% } %>
+
+          <!-- Reviews Grid -->
+          <% if(listing.reviews && listing.reviews.length > 0){ %>
+            <div class="row g-3">
+              <% for(let review of listing.reviews){ %>
+                <div class="col-md-6">
+                  <div class="review-card h-100 p-3 border rounded-3 bg-white">
+                    <div class="review-header d-flex align-items-center gap-2 mb-2">
+                      <div class="review-avatar">
+                        <%= review.author && review.author.username ? review.author.username.charAt(0).toUpperCase() : 'U' %>
+                      </div>
+                      <div>
+                        <h6 class="mb-0 fw-bold">@<%= review.author ? review.author.username : 'Guest' %></h6>
+                        <small class="text-muted"><%= new Date(review.created_at || Date.now()).toLocaleDateString("en-US", { month: "short", year: "numeric" }) %></small>
+                      </div>
+                    </div>
+
+                    <p class="starability-result mb-2" data-rating="<%= review.rating %>"></p>
+                    <p class="card-text text-secondary small mb-2"><%= review.comment %></p>
+
+                    <% if(currUser && review.author && review.author._id.equals(currUser._id)){ %>
+                      <form method="post" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE">
+                        <button class="btn btn-sm btn-outline-danger" title="Delete Review">
+                          <i class="fa-solid fa-trash-can"></i> Delete
+                        </button>
+                      </form>
+                    <% } %>
+                  </div>
+                </div>
+              <% } %>
+            </div>
+          <% } %>
+        </div>
+
+        <!-- Location & Map -->
+        <div class="map-section mb-4">
+          <h4 class="fw-bold mb-3">Where you'll be</h4>
+          <p class="text-muted"><i class="fa-solid fa-map-pin me-1 text-danger"></i><%= listing.location %>, <%= listing.country %></p>
+          <div class="map-container">
+            <iframe 
+              src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d948582.195276783!2d77.4058915!3d23.1994097!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e1!3m2!1sen!2sin!4v1772202778695!5m2!1sen!2sin" 
+              allowfullscreen="" 
+              loading="lazy" 
+              referrerpolicy="no-referrer-when-downgrade">
+            </iframe>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN: STICKY RESERVATION CARD (Remains visible as left column scrolls) -->
+      <div class="col-lg-5 col-xl-4 mt-4 mt-lg-0">
+        <div class="sticky-reserve-card">
+          
+          <!-- Top Badge: Prices include all fees (Exact Airbnb UI) -->
+          <div class="price-include-fees-badge d-flex align-items-center justify-content-center text-center mb-3">
+            <span class="me-2 fs-5">🏷️</span>
+            <span class="small fw-semibold text-dark">Prices include all fees</span>
+          </div>
+
+          <!-- Main Booking Card Box -->
+          <div class="reserve-card-box">
+            <!-- Price Display with Strikethrough Discount & Nights -->
+            <div class="d-flex align-items-baseline justify-content-between mb-3">
+              <div>
+                <span class="text-decoration-line-through text-muted small me-2" id="showStrikePrice">
+                  &#8377; <%= Math.round((listing.price || 0) * 1.15).toLocaleString("en-IN") %>
+                </span>
+                <span class="fw-bold fs-3 text-dark" id="showPagePrice">
+                  &#8377; <%= listing.price ? listing.price.toLocaleString("en-IN") : 0 %>
+                </span>
+                <span class="text-muted small" id="showPageNightsSub"> for 1 night</span>
+              </div>
+              <div class="small text-muted">
+                <i class="fa-solid fa-star text-warning"></i> 4.88
+              </div>
+            </div>
+
+            <!-- Airbnb Border-Grid: Check-in / Checkout / Guests -->
+            <div class="booking-dates-box mb-3">
+              <!-- Top Row: Check-in & Checkout Split -->
+              <div class="row g-0 border-bottom">
+                <div class="col-6 booking-date-cell border-end">
+                  <div class="booking-date-label">CHECK-IN</div>
+                  <input 
+                    type="date" 
+                    id="stickyCheckIn" 
+                    class="form-control form-control-sm border-0 p-0 fw-semibold bg-transparent" 
+                    value="<%= (typeof checkIn !== 'undefined' && checkIn) ? checkIn : '2026-09-18' %>" 
+                    style="font-size: 0.85rem; box-shadow: none; cursor: pointer;"
+                  >
+                </div>
+                <div class="col-6 booking-date-cell">
+                  <div class="booking-date-label">CHECKOUT</div>
+                  <input 
+                    type="date" 
+                    id="stickyCheckOut" 
+                    class="form-control form-control-sm border-0 p-0 fw-semibold bg-transparent" 
+                    value="<%= (typeof checkOut !== 'undefined' && checkOut) ? checkOut : '2026-09-19' %>" 
+                    style="font-size: 0.85rem; box-shadow: none; cursor: pointer;"
+                  >
+                </div>
+              </div>
+
+              <!-- Bottom Row: Stay Duration & Guests -->
+              <div class="booking-date-cell d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="booking-date-label">GUESTS &amp; DURATION</div>
+                  <span class="fw-semibold small text-dark" id="nightCountDisplay">1 night</span>
+                  <span class="text-muted small">&bull; <%= (typeof guests !== 'undefined' && guests) ? guests : 1 %> guest<%= (typeof guests !== 'undefined' && parseInt(guests, 10) > 1) ? 's' : '' %></span>
+                  <small class="text-muted d-block" style="font-size: 0.68rem;">(Max 2 adults per room)</small>
+                </div>
+
+                <!-- Interactive Duration Buttons -->
+                <div class="d-flex align-items-center gap-2">
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" 
+                    id="nightMinusBtn" 
+                    style="width: 32px; height: 32px; font-weight: bold; line-height: 1;" 
+                    disabled 
+                    title="Decrease night"
+                  >
+                    &minus;
+                  </button>
+                  <button 
+                    type="button" 
+                    class="btn btn-sm btn-outline-secondary rounded-circle d-flex align-items-center justify-content-center" 
+                    id="nightPlusBtn" 
+                    style="width: 32px; height: 32px; font-weight: bold; line-height: 1;" 
+                    title="Increase night"
+                  >
+                    &#43;
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reserve Button (Airbnb Brand Gradient) -->
+            <a href="/listings/<%= listing._id %>/book?nights=1" id="showReserveBtn" class="btn btn-reserve-brand w-100 py-3 fw-bold fs-5 shadow-sm text-center text-decoration-none d-block mb-2">
+              Reserve
+            </a>
+
+            <!-- Microcopy -->
+            <p class="text-center text-muted small mb-0">You won't be charged yet</p>
+
+            <!-- Dynamic Stay Price Breakdown (Airbnb Style) -->
+            <div class="booking-price-breakdown mt-3 pt-3 border-top" id="showPriceBreakdown">
+              <div class="d-flex justify-content-between text-secondary small mb-2">
+                <span id="showBreakdownRate">&#8377; <%= listing.price ? listing.price.toLocaleString("en-IN") : 0 %> x 1 night</span>
+                <span id="showBreakdownBase" class="fw-semibold text-dark">&#8377; <%= listing.price ? listing.price.toLocaleString("en-IN") : 0 %></span>
+              </div>
+              <div class="d-flex justify-content-between text-secondary small mb-2">
+                <span>Taxes &amp; fees (18% GST)</span>
+                <span id="showBreakdownTax" class="fw-semibold text-dark">&#8377; <%= Math.round((listing.price || 0) * 0.18).toLocaleString("en-IN") %></span>
+              </div>
+              <div class="d-flex justify-content-between pt-2 border-top fw-bold text-dark fs-6">
+                <span>Total before taxes</span>
+                <span id="showBreakdownTotal">&#8377; <%= listing.price ? listing.price.toLocaleString("en-IN") : 0 %></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Report Listing link -->
+          <div class="text-center mt-3">
+            <a href="#" class="text-muted small text-decoration-none hover-underline" onclick="alert('Thank you for your feedback. Our safety team will review this listing.'); return false;">
+              <i class="fa-solid fa-flag me-1"></i> Report this listing
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal for All Amenities -->
+    <div class="modal fade" id="allAmenitiesModal" tabindex="-1" aria-labelledby="allAmenitiesModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content rounded-4 p-2 border-0 shadow">
+          <div class="modal-header border-0 pb-2">
+            <h5 class="modal-title fw-bold" id="allAmenitiesModalLabel">What this place offers</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body px-3 pt-0">
+            <h6 class="fw-bold text-muted small text-uppercase tracking-wide mb-3 mt-2">Available amenities</h6>
+            <div class="d-flex flex-column gap-3 mb-4">
+              <% if(listing.amenities) { %>
+                <% for(let a of listing.amenities.filter(item => item.available)) { %>
+                  <div class="d-flex align-items-center border-bottom pb-2">
+                    <div class="me-3 text-secondary text-center" style="width: 28px;">
+                      <i class="<%= a.icon || 'fa-solid fa-check' %> fs-5"></i>
+                    </div>
+                    <span class="fs-6"><%= a.name %></span>
+                  </div>
+                <% } %>
+              <% } %>
+            </div>
+
+            <% if(listing.amenities && listing.amenities.some(item => !item.available)) { %>
+              <h6 class="fw-bold text-muted small text-uppercase tracking-wide mb-3">Not included / Disclosures</h6>
+              <div class="d-flex flex-column gap-3 mb-2">
+                <% for(let a of listing.amenities.filter(item => !item.available)) { %>
+                  <div class="d-flex align-items-center border-bottom pb-2">
+                    <div class="me-3 text-muted text-center" style="width: 28px;">
+                      <i class="<%= a.icon || 'fa-solid fa-ban' %> fs-5"></i>
+                    </div>
+                    <span class="fs-6 text-muted text-decoration-line-through">Unavailable: <%= a.name %></span>
+                  </div>
+                <% } %>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Dynamic Calculation and Date Sync Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const pricePerNight = <%= listing.price || 0 %>;
+      let nights = <%= (typeof nights !== 'undefined' && nights && nights >= 1) ? nights : 1 %>;
+
+      const minusBtn = document.getElementById("nightMinusBtn");
+      const plusBtn = document.getElementById("nightPlusBtn");
+      const countDisplay = document.getElementById("nightCountDisplay");
+      const priceDisplay = document.getElementById("showPagePrice");
+      const strikeDisplay = document.getElementById("showStrikePrice");
+      const subDisplay = document.getElementById("showPageNightsSub");
+      const reserveBtn = document.getElementById("showReserveBtn");
+      const checkInInput = document.getElementById("stickyCheckIn");
+      const checkOutInput = document.getElementById("stickyCheckOut");
+
+      const bdRate = document.getElementById("showBreakdownRate");
+      const bdBase = document.getElementById("showBreakdownBase");
+      const bdTax = document.getElementById("showBreakdownTax");
+      const bdTotal = document.getElementById("showBreakdownTotal");
+
+      function syncMinCheckout() {
+        if (checkInInput && checkInInput.value && checkOutInput) {
+          const d1 = new Date(checkInInput.value);
+          if (!isNaN(d1.getTime())) {
+            const minOut = new Date(d1);
+            minOut.setDate(minOut.getDate() + 1);
+            checkOutInput.min = minOut.toISOString().split("T")[0];
+          }
+        }
+      }
+
+      function updatePricingUI() {
+        if (countDisplay) {
+          countDisplay.textContent = `${nights} night${nights > 1 ? 's' : ''}`;
+        }
+        const totalPrice = pricePerNight * nights;
+        const strikePrice = Math.round(totalPrice * 1.15);
+        const taxAmount = Math.round(totalPrice * 0.18);
+
+        if (priceDisplay) {
+          priceDisplay.innerHTML = `&#8377; ${totalPrice.toLocaleString("en-IN")}`;
+        }
+        if (strikeDisplay) {
+          strikeDisplay.innerHTML = `&#8377; ${strikePrice.toLocaleString("en-IN")}`;
+        }
+        if (subDisplay) {
+          subDisplay.textContent = ` for ${nights} night${nights > 1 ? 's' : ''}`;
+        }
+
+        // Breakdown card elements
+        if (bdRate) {
+          bdRate.textContent = `₹ ${pricePerNight.toLocaleString("en-IN")} x ${nights} night${nights > 1 ? 's' : ''}`;
+        }
+        if (bdBase) {
+          bdBase.textContent = `₹ ${totalPrice.toLocaleString("en-IN")}`;
+        }
+        if (bdTax) {
+          bdTax.textContent = `₹ ${taxAmount.toLocaleString("en-IN")}`;
+        }
+        if (bdTotal) {
+          bdTotal.textContent = `₹ ${totalPrice.toLocaleString("en-IN")}`;
+        }
+
+        if (reserveBtn) {
+          const inVal = checkInInput ? checkInInput.value : "";
+          const outVal = checkOutInput ? checkOutInput.value : "";
+          reserveBtn.href = `/listings/<%= listing._id %>/book?nights=${nights}&checkIn=${inVal}&checkOut=${outVal}`;
+        }
+
+        if (minusBtn) {
+          minusBtn.disabled = (nights <= 1);
+        }
+      }
+
+      // Check-in changed: recalculate nights or advance checkout if needed
+      if (checkInInput) {
+        checkInInput.addEventListener("change", () => {
+          if (!checkInInput.value) return;
+          const d1 = new Date(checkInInput.value);
+          if (isNaN(d1.getTime())) return;
+
+          syncMinCheckout();
+
+          if (checkOutInput && checkOutInput.value) {
+            const d2 = new Date(checkOutInput.value);
+            if (!isNaN(d2.getTime()) && d2 > d1) {
+              nights = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+            } else {
+              // Checkout is same or before checkin: automatically advance checkout
+              const newOut = new Date(d1);
+              newOut.setDate(newOut.getDate() + (nights >= 1 ? nights : 1));
+              checkOutInput.value = newOut.toISOString().split("T")[0];
+            }
+          } else if (checkOutInput) {
+            const newOut = new Date(d1);
+            newOut.setDate(newOut.getDate() + nights);
+            checkOutInput.value = newOut.toISOString().split("T")[0];
+          }
+
+          updatePricingUI();
+        });
+      }
+
+      // Checkout changed: calculate number of nights and update price
+      if (checkOutInput) {
+        checkOutInput.addEventListener("change", () => {
+          if (!checkOutInput.value) return;
+          const d2 = new Date(checkOutInput.value);
+          if (isNaN(d2.getTime())) return;
+
+          let d1 = checkInInput && checkInInput.value ? new Date(checkInInput.value) : null;
+          if (!d1 || isNaN(d1.getTime())) {
+            d1 = new Date(d2);
+            d1.setDate(d1.getDate() - 1);
+            if (checkInInput) checkInInput.value = d1.toISOString().split("T")[0];
+          }
+
+          if (d2 <= d1) {
+            // If user picked checkout earlier than or equal to checkin, reset checkout to checkin + 1 day
+            const adjustedOut = new Date(d1);
+            adjustedOut.setDate(adjustedOut.getDate() + 1);
+            checkOutInput.value = adjustedOut.toISOString().split("T")[0];
+            nights = 1;
+          } else {
+            nights = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+          }
+
+          updatePricingUI();
+        });
+      }
+
+      // Stepper buttons [+] and [-]
+      if (minusBtn && plusBtn) {
+        minusBtn.addEventListener("click", () => {
+          if (nights > 1) {
+            nights--;
+            if (checkInInput && checkOutInput && checkInInput.value) {
+              const d1 = new Date(checkInInput.value);
+              if (!isNaN(d1.getTime())) {
+                const d2 = new Date(d1);
+                d2.setDate(d2.getDate() + nights);
+                checkOutInput.value = d2.toISOString().split("T")[0];
+              }
+            }
+            updatePricingUI();
+          }
+        });
+
+        plusBtn.addEventListener("click", () => {
+          if (nights < 365) {
+            nights++;
+            if (checkInInput && checkOutInput && checkInInput.value) {
+              const d1 = new Date(checkInInput.value);
+              if (!isNaN(d1.getTime())) {
+                const d2 = new Date(d1);
+                d2.setDate(d2.getDate() + nights);
+                checkOutInput.value = d2.toISOString().split("T")[0];
+              }
+            }
+            updatePricingUI();
+          }
+        });
+      }
+
+      // Initial calculation and synchronization
+      if (checkInInput && checkOutInput && checkInInput.value && checkOutInput.value) {
+        const d1 = new Date(checkInInput.value);
+        const d2 = new Date(checkOutInput.value);
+        if (!isNaN(d1.getTime()) && !isNaN(d2.getTime()) && d2 > d1) {
+          nights = Math.max(1, Math.round((d2 - d1) / (1000 * 60 * 60 * 24)));
+        }
+      }
+      syncMinCheckout();
+      updatePricingUI();
+    });
+  </script>
 </body>

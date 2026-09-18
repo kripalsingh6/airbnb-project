@@ -1,61 +1,316 @@
 <% layout("/layout/boilerplate") -%>
-   <br>
-    <div class="row">
-        <div class="col-8 offset-2">
-    <h3><b>Create a New Listing</b></h3>
-    <form method="post" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="title" class="form-label">title</label>
-            <input name="listing[title]" type="text" placeholder="Enter title" class="form-control" required>
-            <div class="invalid-feedback">
-      Title should be required
-    </div>
+<body>
+  <div class="row my-4">
+    <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+      <div class="form-card p-4 p-md-5 border rounded-4 bg-white shadow-sm">
+        
+        <!-- Header -->
+        <div class="mb-4 pb-3 border-bottom">
+          <span class="badge bg-danger-subtle text-danger mb-2 px-3 py-1 rounded-pill fw-semibold">
+            <i class="fa-solid fa-house-flag me-1"></i> Host on Wanderlust
+          </span>
+          <h2 class="fw-bold mb-1">Host your home</h2>
+          <p class="text-muted mb-0">Fill in the property details, room specs, and facilities to publish your new listing.</p>
         </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea name="listing[description]" type="text" placeholder="add description" class="form-control"></textarea>
-            <div class="invalid-feedback">
-      Please enter a short Description
-    </div>
-        </div>
-         <div class="mb-3">
-            <label for="image" class="form-label">Upload Image</label>
-            <input name="listing[image]" 
-            type="file" 
-            placeholder="Enter image Url/Link" 
-            class="form-control" 
-            required>
-            <div class="invalid-feedback">
-      Image should be required
-    </div>
-            
-        </div>
-        <div class="row">
-             <div class="mb-3 col-md-4" >
-            <label for="price" class="form-label"> Price</label>
-            <input  name="listing[price]" placeholder="Enter price" class="form-control" required>
-            <div class="invalid-feedback">
-      Price should be valid
-    </div>
-        </div>
-         <div class="mb-3 col-md-8">
-            <label for="Country" class="form-label">Country</label>
-            <input name="listing[country]" placeholder="Enter country" type="text" class="form-control" required>
-            <div class="invalid-feedback">
-      Country should be valid
-    </div>
-    </div>
-        </div>
-        <div class="mb-3">
-            <label for="location" class="form-label">Location</label>
-            <input name="listing[location]" type="text" placeholder="Enter location" class="form-control" required>
-            <div class="invalid-feedback">
-      Location should be valid
-    </div>
-        </div>
-        <button class="btn btn-dark add-btn" class="mb-3">Add</button>
-    </form>
-    </div>
-    </div>
-    
 
+        <form method="post" action="/listings" novalidate class="needs-validation" enctype="multipart/form-data">
+          
+          <!-- SECTION 1: Basic Information -->
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-3"><i class="fa-regular fa-id-card me-2 text-brand"></i>Property Information</h5>
+            
+            <div class="row g-3">
+              <!-- Title -->
+              <div class="col-md-8">
+                <label for="title" class="form-label fw-semibold">Property Title</label>
+                <input name="listing[title]" id="title" type="text" placeholder="e.g. Cozy Beachfront Villa with Ocean Views" class="form-control py-2" required>
+                <div class="invalid-feedback">Please enter a catchy title.</div>
+              </div>
+
+              <!-- Property Type -->
+              <div class="col-md-4">
+                <label for="propertyType" class="form-label fw-semibold">Property Type</label>
+                <select name="listing[propertyType]" id="propertyType" class="form-select py-2">
+                  <option value="Entire home" selected>Entire home</option>
+                  <option value="Villa">Villa</option>
+                  <option value="Cottage">Cottage</option>
+                  <option value="Apartment">Apartment</option>
+                  <option value="Modern Loft">Modern Loft</option>
+                  <option value="Cabin">Cabin</option>
+                  <option value="Chalet">Chalet</option>
+                  <option value="Treehouse">Treehouse</option>
+                  <option value="Farmhouse">Farmhouse</option>
+                  <option value="Beachfront Bungalow">Beachfront Bungalow</option>
+                </select>
+              </div>
+
+              <!-- Description -->
+              <div class="col-12">
+                <label for="description" class="form-label fw-semibold">The space / Description</label>
+                <textarea name="listing[description]" id="description" rows="4" placeholder="Tell guests what makes your place special, its atmosphere, and unique surroundings..." class="form-control" required></textarea>
+                <div class="invalid-feedback">Please provide a short description.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Room Specs & Guest Capacity -->
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-bed me-2 text-brand"></i>Room Specs &amp; Capacity</h5>
+            <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <label for="guests" class="form-label fw-semibold">Max Guests</label>
+                <input type="number" name="listing[guests]" id="guests" min="1" max="16" value="2" class="form-control" required>
+                <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">(Max 2 adults/room)</small>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <label for="bedrooms" class="form-label fw-semibold">Bedrooms</label>
+                <input type="number" name="listing[bedrooms]" id="bedrooms" min="1" max="20" value="1" class="form-control" required>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <label for="beds" class="form-label fw-semibold">Beds</label>
+                <input type="number" name="listing[beds]" id="beds" min="1" max="30" value="1" class="form-control" required>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <label for="bathrooms" class="form-label fw-semibold">Bathrooms</label>
+                <input type="number" name="listing[bathrooms]" id="bathrooms" min="1" max="20" value="1" class="form-control" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: Location & Pricing -->
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-location-dot me-2 text-brand"></i>Location &amp; Pricing</h5>
+            <div class="row g-3">
+              <!-- Location / City -->
+              <div class="col-md-6">
+                <label for="location" class="form-label fw-semibold">City / Destination</label>
+                <input name="listing[location]" id="location" type="text" placeholder="e.g. Karjat, Goa, Mumbai" class="form-control py-2" required>
+                <div class="invalid-feedback">Please enter location.</div>
+              </div>
+
+              <!-- Country -->
+              <div class="col-md-6">
+                <label for="country" class="form-label fw-semibold">Country</label>
+                <input name="listing[country]" id="country" placeholder="e.g. India" type="text" class="form-control py-2" required>
+                <div class="invalid-feedback">Please enter country.</div>
+              </div>
+
+              <!-- Price per Night -->
+              <div class="col-md-6">
+                <label for="price" class="form-label fw-semibold">Price per Night (&#8377; INR)</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light fw-bold">&#8377;</span>
+                  <input name="listing[price]" id="price" type="number" min="0" placeholder="2500" class="form-control py-2" required>
+                </div>
+                <div class="invalid-feedback">Please enter a valid price.</div>
+              </div>
+
+              <!-- Image Upload -->
+              <div class="col-md-6">
+                <label for="image" class="form-label fw-semibold">Upload Cover Photo</label>
+                <input name="listing[image]" id="image" type="file" class="form-control py-2" required accept="image/*">
+                <div class="invalid-feedback">Please upload a photo of your property.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: What this place offers (Amenities & Facilities) -->
+          <div class="mb-4 pb-3 border-bottom">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h5 class="fw-bold mb-1"><i class="fa-solid fa-wand-magic-sparkles me-2 text-brand"></i>What this place offers</h5>
+                <p class="text-muted small mb-0">Select the amenities and facilities available at your place.</p>
+              </div>
+              <span class="badge bg-light text-secondary border small">Select all that apply</span>
+            </div>
+
+            <!-- Amenities Checkboxes Grid -->
+            <div class="row g-2">
+              
+              <!-- Wifi -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Wifi|fa-solid fa-wifi|true" id="am_wifi" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_wifi">
+                    <i class="fa-solid fa-wifi text-secondary me-2" style="width: 20px;"></i> Wifi
+                  </label>
+                </div>
+              </div>
+
+              <!-- Free parking on premises -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Free parking on premises|fa-solid fa-square-parking|true" id="am_parking" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_parking">
+                    <i class="fa-solid fa-square-parking text-secondary me-2" style="width: 20px;"></i> Free parking on premises
+                  </label>
+                </div>
+              </div>
+
+              <!-- Pets allowed -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Pets allowed|fa-solid fa-paw|true" id="am_pets" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_pets">
+                    <i class="fa-solid fa-paw text-secondary me-2" style="width: 20px;"></i> Pets allowed
+                  </label>
+                </div>
+              </div>
+
+              <!-- Air conditioning -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Air conditioning|fa-solid fa-snowflake|true" id="am_ac" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_ac">
+                    <i class="fa-solid fa-snowflake text-secondary me-2" style="width: 20px;"></i> Air conditioning
+                  </label>
+                </div>
+              </div>
+
+              <!-- Private patio or balcony -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Private patio or balcony|fa-solid fa-door-open|true" id="am_patio" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_patio">
+                    <i class="fa-solid fa-door-open text-secondary me-2" style="width: 20px;"></i> Private patio or balcony
+                  </label>
+                </div>
+              </div>
+
+              <!-- Private back garden – Fully fenced -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Private back garden – Fully fenced|fa-solid fa-tree|true" id="am_garden" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_garden">
+                    <i class="fa-solid fa-tree text-secondary me-2" style="width: 20px;"></i> Private back garden – Fully fenced
+                  </label>
+                </div>
+              </div>
+
+              <!-- Bluetooth sound system -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Bluetooth sound system|fa-solid fa-radio|true" id="am_sound" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_sound">
+                    <i class="fa-solid fa-radio text-secondary me-2" style="width: 20px;"></i> Bluetooth sound system
+                  </label>
+                </div>
+              </div>
+
+              <!-- Kitchen -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Kitchen|fa-solid fa-kitchen-set|true" id="am_kitchen" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_kitchen">
+                    <i class="fa-solid fa-kitchen-set text-secondary me-2" style="width: 20px;"></i> Kitchen
+                  </label>
+                </div>
+              </div>
+
+              <!-- Dedicated workspace -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Dedicated workspace|fa-solid fa-laptop|true" id="am_desk">
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_desk">
+                    <i class="fa-solid fa-laptop text-secondary me-2" style="width: 20px;"></i> Dedicated workspace
+                  </label>
+                </div>
+              </div>
+
+              <!-- Swimming pool -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Swimming pool|fa-solid fa-water-ladder|true" id="am_pool">
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_pool">
+                    <i class="fa-solid fa-water-ladder text-secondary me-2" style="width: 20px;"></i> Swimming pool
+                  </label>
+                </div>
+              </div>
+
+              <!-- 65" 4K HDTV -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="65&quot; 4K HDTV with Netflix|fa-solid fa-tv|true" id="am_tv">
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_tv">
+                    <i class="fa-solid fa-tv text-secondary me-2" style="width: 20px;"></i> 65" 4K HDTV with Netflix
+                  </label>
+                </div>
+              </div>
+
+              <!-- Indoor fireplace -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Indoor fireplace|fa-solid fa-fire|true" id="am_fire">
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_fire">
+                    <i class="fa-solid fa-fire text-secondary me-2" style="width: 20px;"></i> Indoor fireplace
+                  </label>
+                </div>
+              </div>
+
+              <!-- Beach access -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Beach access|fa-solid fa-umbrella-beach|true" id="am_beach">
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_beach">
+                    <i class="fa-solid fa-umbrella-beach text-secondary me-2" style="width: 20px;"></i> Beach access
+                  </label>
+                </div>
+              </div>
+
+              <!-- EV charger -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="EV charger|fa-solid fa-charging-station|true" id="am_ev">
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="am_ev">
+                    <i class="fa-solid fa-charging-station text-secondary me-2" style="width: 20px;"></i> EV charger
+                  </label>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- SECTION 5: Safety Disclosures (Unavailable Amenities) -->
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-1"><i class="fa-solid fa-shield-halved me-2 text-brand"></i>Safety &amp; Disclosures</h5>
+            <p class="text-muted small mb-3">Check disclosures for safety alarms that are not included (shown as "Unavailable" on listing).</p>
+
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Carbon monoxide alarm|fa-solid fa-triangle-exclamation|false" id="am_co" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center text-muted" for="am_co">
+                    <i class="fa-solid fa-triangle-exclamation text-warning me-2" style="width: 20px;"></i> Unavailable: Carbon monoxide alarm
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Smoke alarm|fa-solid fa-ban|false" id="am_smoke" checked>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center text-muted" for="am_smoke">
+                    <i class="fa-solid fa-ban text-danger me-2" style="width: 20px;"></i> Unavailable: Smoke alarm
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-brand px-4 py-3 fw-bold fs-6 rounded-pill flex-grow-1 shadow-sm">
+              <i class="fa-solid fa-plus me-1"></i> Create &amp; Publish Listing
+            </button>
+            <a href="/listings" class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-semibold">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</body>

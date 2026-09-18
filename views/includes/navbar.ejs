@@ -1,28 +1,561 @@
-<nav class="navbar navbar-expand-md bg-body-light border-bottom sticky-top">
-  <div class="container-fluid">
-    <a class="navbar-brand" href="/"><i class="fa-regular fa-compass"></i></a>
-    <button class="navbar-toggler" type="button" 
-    data-bs-toggle="collapse" 
-    data-bs-target="#navbarNavAltMarkup" 
-    >
+<nav class="navbar navbar-expand-md bg-white border-bottom sticky-top">
+  <div class="container-fluid px-md-4">
+    <!-- Left: Brand Logo (Exact match to Screenshot 1) -->
+    <a class="navbar-brand d-flex align-items-center gap-2 m-0" href="/listings">
+      <i class="fa-regular fa-compass fs-3 text-brand"></i>
+      <span class="brand-text">Wanderlust</span>
+    </a>
+
+    <!-- Mobile Toggler -->
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-      <div class="navbar-nav">
-        <a class="nav-link" href="/">Home</a>
-        <a class="nav-link" href="/listings">All Listings</a>
-        <a class="nav-link" href="/listings/new">Add new Listings</a>
-        
-      </div>
-       <div class="navbar-nav ms-auto" >
-        <% if(!currUser){ %>
-        <a class="nav-link" href="/signup">Sign up</a>
-        <a class="nav-link" href="/login">Log in</a>
-         <% } %>
 
-        <% if(currUser){ %>
-        <a class="nav-link" href="/logout">Log out</a>
-        <% } %>
+    <!-- Navbar Content -->
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <!-- 3-Segment Search Bar (Where | When | Who) -->
+      <div class="search-bar-wrapper mx-auto my-2 my-lg-0 d-none d-lg-block">
+        <form action="/listings" method="GET" id="airbnbSearchForm">
+          <input type="hidden" name="checkIn" id="searchCheckInInput"
+            value="<%= typeof checkIn !== 'undefined' ? checkIn : '' %>">
+          <input type="hidden" name="checkOut" id="searchCheckOutInput"
+            value="<%= typeof checkOut !== 'undefined' ? checkOut : '' %>">
+          <input type="hidden" name="guests" id="searchGuestsInput"
+            value="<%= typeof guests !== 'undefined' ? guests : '' %>">
+
+          <div class="airbnb-search-bar" id="searchBarContainer">
+            <!-- Segment 1: Where with manual typing -->
+            <div class="search-segment" id="segWhere" tabindex="0">
+              <label for="searchWhereInput" class="search-label mb-0" style="cursor: pointer;">Where</label>
+              <input type="text" name="q" id="searchWhereInput" class="search-segment-input"
+                placeholder="Search destinations" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>"
+                autocomplete="off">
+            </div>
+
+            <div class="search-divider"></div>
+
+            <!-- Segment 2: When -->
+            <div class="search-segment" id="segWhen" tabindex="0">
+              <span class="search-label">When</span>
+              <span
+                class="search-subtext <%= (typeof checkIn !== 'undefined' && checkIn && typeof checkOut !== 'undefined' && checkOut) ? 'has-val' : '' %>"
+                id="segWhenText">
+                <%= (typeof checkIn !=='undefined' && checkIn && typeof checkOut !=='undefined' && checkOut) ? (checkIn
+                  + ' – ' + checkOut) : 'Add dates' %>
+              </span>
+            </div>
+
+            <div class="search-divider"></div>
+
+            <!-- Segment 3: Who -->
+            <div class="search-segment" id="segWho" tabindex="0">
+              <span class="search-label">Who</span>
+              <span class="search-subtext <%= (typeof guests !== 'undefined' && guests) ? 'has-val' : '' %>"
+                id="segWhoText">
+                <%= (typeof guests !=='undefined' && guests) ? (guests + ' guests' ) : 'Add guests' %>
+              </span>
+            </div>
+
+            <!-- Search Action Button -->
+            <button type="submit" class="btn-airbnb-search" id="btnMainSearch" title="Search">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <span>Search</span>
+            </button>
+          </div>
+
+          <!-- POPOVER 1: Where (Manual City Input & Suggested Destinations) -->
+          <div class="search-popover shadow-lg" id="wherePopover">
+            <!-- Manual City Input Box inside Popover -->
+            <div class="manual-city-input-wrapper mb-3 p-2 px-3 border rounded-pill d-flex align-items-center bg-light">
+              <i class="fa-solid fa-magnifying-glass text-muted me-2"></i>
+              <input type="text" id="popoverCityInput"
+                class="form-control form-control-sm border-0 bg-transparent fw-semibold shadow-none p-0 flex-grow-1"
+                placeholder="Type any city (e.g. Mumbai, Surat, Goa, Delhi...)"
+                value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>" autocomplete="off">
+              <button type="button" class="btn btn-sm btn-link text-muted p-0 ms-2" id="clearCityBtn"
+                style="<%= (typeof searchQuery !== 'undefined' && searchQuery) ? '' : 'display: none;' %>"
+                title="Clear">
+                <i class="fa-solid fa-circle-xmark"></i>
+              </button>
+            </div>
+
+            <!-- Dynamic 'Search for [typed city]' Option -->
+            <div id="manualSearchOption" class="destination-item mb-2"
+              style="display: none; background-color: #fff1f2; border: 1px dashed #e61e4d;">
+              <div class="destination-icon-box" style="background-color: #ffe4e6; color: #e61e4d;">
+                <i class="fa-solid fa-location-crosshairs"></i>
+              </div>
+              <div class="flex-grow-1">
+                <div class="fw-bold text-danger" id="manualSearchOptionTitle">Search for city</div>
+                <small class="text-muted">Click to select or press Enter</small>
+              </div>
+              <span class="badge bg-danger rounded-pill px-2 py-1">Select</span>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center px-2 mb-2">
+              <span class="small fw-bold text-uppercase text-muted"
+                style="letter-spacing: 0.5px; font-size: 0.72rem;">Suggested Destinations</span>
+              <button type="button" class="btn-close btn-sm" id="closeWhereBtn" aria-label="Close"></button>
+            </div>
+            <div class="destination-list" id="destinationList" style="max-height: 320px; overflow-y: auto;">
+              <!-- New Delhi -->
+              <div class="destination-item" data-val="New Delhi, Delhi">
+                <div class="destination-icon-box"><i class="fa-solid fa-location-dot text-danger"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">New Delhi</div>
+                  <small class="text-muted">City in Delhi, India</small>
+                </div>
+              </div>
+
+              <!-- Connaught Place -->
+              <div class="destination-item" data-val="Connaught Place">
+                <div class="destination-icon-box"><i class="fa-solid fa-house-chimney text-secondary"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Connaught Place</div>
+                  <small class="text-muted">Neighbourhood &bull; Central Delhi</small>
+                </div>
+              </div>
+
+              <!-- IGI Airport -->
+              <div class="destination-item" data-val="Indira Gandhi International Airport (DEL)">
+                <div class="destination-icon-box"><i class="fa-solid fa-plane-departure text-primary"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Indira Gandhi International Airport (DEL)</div>
+                  <small class="text-muted">Airport &bull; New Delhi</small>
+                </div>
+              </div>
+
+              <!-- Vasant Kunj -->
+              <div class="destination-item" data-val="Vasant Kunj">
+                <div class="destination-icon-box"><i class="fa-solid fa-house-chimney text-secondary"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Vasant Kunj</div>
+                  <small class="text-muted">Neighbourhood &bull; South Delhi</small>
+                </div>
+              </div>
+
+              <!-- Mahipalpur -->
+              <div class="destination-item" data-val="Mahipalpur">
+                <div class="destination-icon-box"><i class="fa-solid fa-house-chimney text-secondary"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Mahipalpur</div>
+                  <small class="text-muted">Neighbourhood &bull; Airport area</small>
+                </div>
+              </div>
+
+              <!-- Goa -->
+              <div class="destination-item" data-val="Goa">
+                <div class="destination-icon-box"><i class="fa-solid fa-umbrella-beach text-warning"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Goa</div>
+                  <small class="text-muted">Candolim, Baga, Siolim, Nerul &bull; Beaches</small>
+                </div>
+              </div>
+
+              <!-- Karjat -->
+              <div class="destination-item" data-val="Karjat">
+                <div class="destination-icon-box"><i class="fa-solid fa-mountain text-success"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Karjat</div>
+                  <small class="text-muted">The Silver Lining Villa &bull; Maharashtra</small>
+                </div>
+              </div>
+
+              <!-- Malibu -->
+              <div class="destination-item" data-val="Malibu">
+                <div class="destination-icon-box"><i class="fa-solid fa-water text-info"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Malibu</div>
+                  <small class="text-muted">California, United States</small>
+                </div>
+              </div>
+
+              <!-- Aspen -->
+              <div class="destination-item" data-val="Aspen">
+                <div class="destination-icon-box"><i class="fa-solid fa-snowflake text-primary"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Aspen</div>
+                  <small class="text-muted">Colorado, United States</small>
+                </div>
+              </div>
+
+              <!-- Florence -->
+              <div class="destination-item" data-val="Florence">
+                <div class="destination-icon-box"><i class="fa-solid fa-landmark text-secondary"></i></div>
+                <div>
+                  <div class="fw-bold text-dark">Florence</div>
+                  <small class="text-muted">Tuscany, Italy</small>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- POPOVER 2: When (Calendar - Exact match to Screenshot 2) -->
+          <div class="search-popover shadow-lg" id="whenPopover">
+            <!-- Top Tab Switcher -->
+            <div class="d-flex justify-content-center mb-3">
+              <div class="bg-light p-1 rounded-pill d-inline-flex border">
+                <button type="button"
+                  class="btn btn-sm btn-white bg-white shadow-sm rounded-pill px-4 fw-bold py-1">Dates</button>
+                <button type="button" class="btn btn-sm text-muted rounded-pill px-4 py-1"
+                  onclick="alert('Flexible search enabled')">Flexible</button>
+              </div>
+            </div>
+
+            <!-- Date Inputs Bar -->
+            <div class="row g-2 mb-3">
+              <div class="col-6">
+                <div class="p-2 border rounded-3 bg-light">
+                  <small class="d-block fw-bold text-uppercase text-muted" style="font-size: 0.65rem;">CHECK-IN
+                    DATE</small>
+                  <input type="date" id="popoverCheckInInput"
+                    class="form-control form-control-sm border-0 p-0 fw-semibold bg-transparent"
+                    value="<%= (typeof checkIn !== 'undefined' && checkIn) ? checkIn : '2026-09-18' %>"
+                    style="font-size: 0.9rem;">
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="p-2 border rounded-3 bg-light">
+                  <small class="d-block fw-bold text-uppercase text-muted" style="font-size: 0.65rem;">CHECKOUT
+                    DATE</small>
+                  <input type="date" id="popoverCheckOutInput"
+                    class="form-control form-control-sm border-0 p-0 fw-semibold bg-transparent"
+                    value="<%= (typeof checkOut !== 'undefined' && checkOut) ? checkOut : '2026-09-20' %>"
+                    style="font-size: 0.9rem;">
+                </div>
+              </div>
+            </div>
+
+            <!-- Visual Calendar Grid (September 2026 / October 2026) -->
+            <div class="row text-center mb-3">
+              <div class="col-6">
+                <div class="fw-bold mb-2 small">September 2026</div>
+                <div class="d-flex justify-content-between text-muted small fw-semibold mb-1"
+                  style="font-size: 0.72rem;">
+                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                </div>
+                <div class="d-grid" style="grid-template-columns: repeat(7, 1fr); gap: 2px;">
+                  <span class="cal-day-cell empty"></span><span class="cal-day-cell empty"></span>
+                  <span class="cal-day-cell" data-date="2026-09-01">1</span>
+                  <span class="cal-day-cell" data-date="2026-09-02">2</span>
+                  <span class="cal-day-cell" data-date="2026-09-03">3</span>
+                  <span class="cal-day-cell" data-date="2026-09-04">4</span>
+                  <span class="cal-day-cell" data-date="2026-09-05">5</span>
+                  <span class="cal-day-cell" data-date="2026-09-06">6</span>
+                  <span class="cal-day-cell" data-date="2026-09-07">7</span>
+                  <span class="cal-day-cell" data-date="2026-09-08">8</span>
+                  <span class="cal-day-cell" data-date="2026-09-09">9</span>
+                  <span class="cal-day-cell" data-date="2026-09-10">10</span>
+                  <span class="cal-day-cell" data-date="2026-09-11">11</span>
+                  <span class="cal-day-cell" data-date="2026-09-12">12</span>
+                  <span class="cal-day-cell" data-date="2026-09-13">13</span>
+                  <span class="cal-day-cell" data-date="2026-09-14">14</span>
+                  <span class="cal-day-cell" data-date="2026-09-15">15</span>
+                  <span class="cal-day-cell" data-date="2026-09-16">16</span>
+                  <span class="cal-day-cell" data-date="2026-09-17">17</span>
+                  <span class="cal-day-cell selected" data-date="2026-09-18">18</span>
+                  <span class="cal-day-cell in-range" data-date="2026-09-19">19</span>
+                  <span class="cal-day-cell selected" data-date="2026-09-20">20</span>
+                  <span class="cal-day-cell" data-date="2026-09-21">21</span>
+                  <span class="cal-day-cell" data-date="2026-09-22">22</span>
+                  <span class="cal-day-cell" data-date="2026-09-23">23</span>
+                  <span class="cal-day-cell" data-date="2026-09-24">24</span>
+                  <span class="cal-day-cell" data-date="2026-09-25">25</span>
+                  <span class="cal-day-cell" data-date="2026-09-26">26</span>
+                  <span class="cal-day-cell" data-date="2026-09-27">27</span>
+                  <span class="cal-day-cell" data-date="2026-09-28">28</span>
+                  <span class="cal-day-cell" data-date="2026-09-29">29</span>
+                  <span class="cal-day-cell" data-date="2026-09-30">30</span>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="fw-bold mb-2 small">October 2026</div>
+                <div class="d-flex justify-content-between text-muted small fw-semibold mb-1"
+                  style="font-size: 0.72rem;">
+                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
+                </div>
+                <div class="d-grid" style="grid-template-columns: repeat(7, 1fr); gap: 2px;">
+                  <span class="cal-day-cell empty"></span><span class="cal-day-cell empty"></span><span
+                    class="cal-day-cell empty"></span><span class="cal-day-cell empty"></span>
+                  <span class="cal-day-cell" data-date="2026-10-01">1</span>
+                  <span class="cal-day-cell" data-date="2026-10-02">2</span>
+                  <span class="cal-day-cell" data-date="2026-10-03">3</span>
+                  <span class="cal-day-cell" data-date="2026-10-04">4</span>
+                  <span class="cal-day-cell" data-date="2026-10-05">5</span>
+                  <span class="cal-day-cell" data-date="2026-10-06">6</span>
+                  <span class="cal-day-cell" data-date="2026-10-07">7</span>
+                  <span class="cal-day-cell" data-date="2026-10-08">8</span>
+                  <span class="cal-day-cell" data-date="2026-10-09">9</span>
+                  <span class="cal-day-cell" data-date="2026-10-10">10</span>
+                  <span class="cal-day-cell" data-date="2026-10-11">11</span>
+                  <span class="cal-day-cell" data-date="2026-10-12">12</span>
+                  <span class="cal-day-cell" data-date="2026-10-13">13</span>
+                  <span class="cal-day-cell" data-date="2026-10-14">14</span>
+                  <span class="cal-day-cell" data-date="2026-10-15">15</span>
+                  <span class="cal-day-cell" data-date="2026-10-16">16</span>
+                  <span class="cal-day-cell" data-date="2026-10-17">17</span>
+                  <span class="cal-day-cell" data-date="2026-10-18">18</span>
+                  <span class="cal-day-cell" data-date="2026-10-19">19</span>
+                  <span class="cal-day-cell" data-date="2026-10-20">20</span>
+                  <span class="cal-day-cell" data-date="2026-10-21">21</span>
+                  <span class="cal-day-cell" data-date="2026-10-22">22</span>
+                  <span class="cal-day-cell" data-date="2026-10-23">23</span>
+                  <span class="cal-day-cell" data-date="2026-10-24">24</span>
+                  <span class="cal-day-cell" data-date="2026-10-25">25</span>
+                  <span class="cal-day-cell" data-date="2026-10-26">26</span>
+                  <span class="cal-day-cell" data-date="2026-10-27">27</span>
+                  <span class="cal-day-cell" data-date="2026-10-28">28</span>
+                  <span class="cal-day-cell" data-date="2026-10-29">29</span>
+                  <span class="cal-day-cell" data-date="2026-10-30">30</span>
+                  <span class="cal-day-cell" data-date="2026-10-31">31</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom Flex Chips (Exact match to Screenshot 2) -->
+            <div class="d-flex flex-wrap gap-2 pt-2 border-top justify-content-center">
+              <button type="button" class="btn btn-sm btn-outline-dark rounded-pill px-3 date-flex-chip active"
+                data-flex="0">Exact dates</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 date-flex-chip"
+                data-flex="1">&plusmn; 1 day</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 date-flex-chip"
+                data-flex="2">&plusmn; 2 days</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 date-flex-chip"
+                data-flex="3">&plusmn; 3 days</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 date-flex-chip"
+                data-flex="7">&plusmn; 7 days</button>
+              <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 date-flex-chip"
+                data-flex="14">&plusmn; 14 days</button>
+            </div>
+          </div>
+
+          <!-- POPOVER 3: Who (Guest Steppers - Exact match to Screenshot 3) -->
+          <div class="search-popover shadow-lg" id="whoPopover">
+            <!-- Adults -->
+            <div class="guest-stepper-row">
+              <div>
+                <div class="fw-bold">Adults</div>
+                <small class="text-muted">Ages 13 or above</small>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <button type="button" class="guest-counter-btn" id="btnAdultMinus">&minus;</button>
+                <span class="fw-bold" id="txtAdultCount" style="width: 18px; text-align: center;">1</span>
+                <button type="button" class="guest-counter-btn" id="btnAdultPlus">&#43;</button>
+              </div>
+            </div>
+
+            <!-- Children -->
+            <div class="guest-stepper-row">
+              <div>
+                <div class="fw-bold">Children</div>
+                <small class="text-muted">Ages 2–12</small>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <button type="button" class="guest-counter-btn" id="btnChildMinus" disabled>&minus;</button>
+                <span class="fw-bold" id="txtChildCount" style="width: 18px; text-align: center;">0</span>
+                <button type="button" class="guest-counter-btn" id="btnChildPlus">&#43;</button>
+              </div>
+            </div>
+
+            <!-- Infants -->
+            <div class="guest-stepper-row">
+              <div>
+                <div class="fw-bold">Infants</div>
+                <small class="text-muted">Under 2</small>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <button type="button" class="guest-counter-btn" id="btnInfantMinus" disabled>&minus;</button>
+                <span class="fw-bold" id="txtInfantCount" style="width: 18px; text-align: center;">0</span>
+                <button type="button" class="guest-counter-btn" id="btnInfantPlus">&#43;</button>
+              </div>
+            </div>
+
+            <!-- Pets -->
+            <div class="guest-stepper-row">
+              <div>
+                <div class="fw-bold">Pets</div>
+                <small class="text-muted text-decoration-underline cursor-pointer">Bringing a service animal?</small>
+              </div>
+              <div class="d-flex align-items-center gap-3">
+                <button type="button" class="guest-counter-btn" id="btnPetMinus" disabled>&minus;</button>
+                <span class="fw-bold" id="txtPetCount" style="width: 18px; text-align: center;">0</span>
+                <button type="button" class="guest-counter-btn" id="btnPetPlus">&#43;</button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Mobile Search Bar (Compact fallback for small screens) -->
+      <form action="/listings" method="GET" class="d-lg-none my-2 w-100">
+        <div class="nav-search-bar w-100 justify-content-between">
+          <input type="text" name="q" class="nav-search-input flex-grow-1"
+            placeholder="Where to? (e.g. New Delhi, Goa...)"
+            value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
+          <button class="btn-search" type="submit" title="Search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </button>
+        </div>
+      </form>
+
+      <!-- Right Navigation Links (Matching Screenshot 1) -->
+      <div class="navbar-nav ms-auto align-items-md-center gap-2">
+        <a class="nav-link btn-nav-host" href="/listings/new">
+          Become a host
+        </a>
+
+        <!-- Quick Dark/Light Theme Button -->
+        <button class="nav-link px-2 d-none d-md-flex align-items-center justify-content-center btn-theme-toggle border-0 bg-transparent" id="navThemeToggleBtn" title="Toggle Dark/Light Mode" type="button" style="cursor: pointer; width: 38px; height: 38px; border-radius: 50%;">
+          <i class="fa-solid fa-moon fs-5" id="navThemeIcon"></i>
+        </button>
+
+        <a class="nav-link px-2 d-none d-md-block text-dark" href="#" title="Language &amp; Currency"
+          onclick="alert('Languages &amp; Currency: English (IN) · ₹ INR'); return false;">
+          <i class="fa-solid fa-globe"></i>
+        </a>
+
+        <!-- User Profile Pill & Right Dropdown Menu (Exact match to Screenshot) -->
+        <div class="user-menu-container position-relative">
+          <button
+            class="user-profile-menu-pill d-flex align-items-center gap-2 border rounded-pill bg-white px-2 py-1 shadow-sm"
+            type="button" id="userProfileMenuBtn" aria-expanded="false" aria-haspopup="true" title="Account Menu">
+            <i class="fa-solid fa-bars text-secondary small ms-1"></i>
+            <span class="user-avatar-circle">
+              <%= currUser ? currUser.username.charAt(0).toUpperCase() : '👤' %>
+            </span>
+          </button>
+
+          <!-- Floating Right Dropdown Menu (Drops at Right Side with Perfect Motion) -->
+          <div class="right-dropdown-menu shadow-lg" id="userDropdownMenu" role="menu">
+            <% if (currUser) { %>
+              <div class="menu-user-header px-3 py-2 border-bottom mb-1">
+                <div class="fw-bold text-truncate">
+                  <%= currUser.username %>
+                </div>
+                <small class="text-muted text-truncate d-block">
+                  <%= currUser.email || 'Member' %>
+                </small>
+              </div>
+              <% } %>
+
+                <!-- Section 1: Core Navigation -->
+                <a href="/wishlists" class="menu-drop-item">
+                  <i class="fa-regular fa-heart me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Wishlists</span>
+                  <span class="badge bg-danger rounded-pill ms-auto" id="menuWishlistBadge"
+                    style="<%= (typeof wishlistIds !== 'undefined' && wishlistIds && wishlistIds.length > 0) ? '' : 'display: none;' %>">
+                    <%= typeof wishlistIds !=='undefined' && wishlistIds ? wishlistIds.length : 0 %>
+                  </span>
+                </a>
+
+                <a href="/bookings" class="menu-drop-item">
+                  <i class="fa-solid fa-suitcase-rolling me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Trips</span>
+                </a>
+
+                <a href="#" class="menu-drop-item" onclick="alert('Messages feature coming soon!'); return false;">
+                  <i class="fa-regular fa-comment-dots me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Messages</span>
+                </a>
+
+                <a href="#" class="menu-drop-item"
+                  onclick="alert('Profile details: <%= currUser ? currUser.username : 'Guest' %>'); return false;">
+                  <i class="fa-regular fa-circle-user me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Profile</span>
+                </a>
+
+                <div class="menu-divider"></div>
+
+                <!-- Theme Mode Options (White mode & Dark mode) -->
+                <div class="px-3 py-2 my-1 border-bottom" id="themeSelectorContainer">
+                  <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="small fw-semibold text-muted text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Appearance</span>
+                    <span class="badge rounded-pill bg-danger-subtle text-danger" id="currentThemeBadge" style="font-size: 0.7rem; font-weight: 600;">White Mode</span>
+                  </div>
+                  <div class="theme-options-group d-flex p-1 rounded-pill" style="background: var(--bg-light); border: 1px solid var(--border-color);">
+                    <button type="button" class="theme-btn-option flex-fill border-0 rounded-pill py-1 px-2 d-flex align-items-center justify-content-center gap-1 active" id="themeOptLight" data-theme-val="light" title="Switch to White Mode">
+                      <i class="fa-solid fa-sun text-warning small"></i>
+                      <span class="small fw-bold">White mode</span>
+                    </button>
+                    <button type="button" class="theme-btn-option flex-fill border-0 rounded-pill py-1 px-2 d-flex align-items-center justify-content-center gap-1" id="themeOptDark" data-theme-val="dark" title="Switch to Dark Mode">
+                      <i class="fa-solid fa-moon text-primary small"></i>
+                      <span class="small fw-bold">Dark mode</span>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Section 2: Account Utilities -->
+                <a href="#" class="menu-drop-item" onclick="alert('No notifications right now'); return false;">
+                  <i class="fa-regular fa-bell me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Notifications</span>
+                </a>
+
+                <a href="#" class="menu-drop-item" onclick="alert('Account settings'); return false;">
+                  <i class="fa-solid fa-gear me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Account settings</span>
+                </a>
+
+                <a href="#" class="menu-drop-item"
+                  onclick="alert('Languages & Currency: English (IN) · ₹ INR'); return false;">
+                  <i class="fa-solid fa-globe me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Languages &amp; currency</span>
+                </a>
+
+                <a href="#" class="menu-drop-item"
+                  onclick="alert('Help Centre: Contact support 24/7 at support@wanderlust.com'); return false;">
+                  <i class="fa-regular fa-circle-question me-3 text-muted menu-item-icon"></i>
+                  <span class="menu-item-text">Help Centre</span>
+                </a>
+
+                <div class="menu-divider"></div>
+
+                <!-- Section 3: Become a host promo card -->
+                <a href="/listings/new"
+                  class="menu-host-promo text-decoration-none d-flex align-items-center justify-content-between p-3 mx-2 my-1 rounded-3">
+                  <div>
+                    <div class="fw-bold text-dark small">Become a host</div>
+                    <div class="text-muted" style="font-size: 0.76rem; line-height: 1.2;">It's easy to start hosting and
+                      earn extra income.</div>
+                  </div>
+                  <i class="fa-solid fa-house-chimney text-danger fs-4 ms-2"></i>
+                </a>
+
+                <div class="menu-divider"></div>
+
+                <!-- Section 4: Referral Links -->
+                <a href="/listings/new" class="menu-drop-item">
+                  <span class="menu-item-text">Refer a host</span>
+                </a>
+                <a href="/listings" class="menu-drop-item">
+                  <span class="menu-item-text">Find a co-host</span>
+                </a>
+
+                <div class="menu-divider"></div>
+
+                <!-- Section 5: Authentication / Get Started -->
+                <% if (currUser) { %>
+                  <a href="/logout" class="menu-drop-item text-danger fw-semibold">
+                    <i class="fa-solid fa-arrow-right-from-bracket me-3 menu-item-icon"></i>
+                    <span class="menu-item-text">Log out</span>
+                  </a>
+                  <% } else { %>
+                    <a href="/signup" class="menu-drop-item fw-bold text-dark">
+                      <span class="menu-item-text">Sign up</span>
+                    </a>
+                    <a href="/login" class="menu-drop-item">
+                      <span class="menu-item-text">Log in</span>
+                    </a>
+                    <div class="px-3 pt-2 pb-1">
+                      <a href="/listings"
+                        class="btn btn-brand btn-sm w-100 text-center text-white fw-semibold rounded-pill py-2">
+                        Get started
+                      </a>
+                    </div>
+                    <% } %>
+          </div>
+        </div>
       </div>
     </div>
   </div>

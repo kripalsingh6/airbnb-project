@@ -1,62 +1,254 @@
 <% layout("/layout/boilerplate") -%>
 <body>
-     <div class="row mt-3" >
-        <div class="col-8 offset-2">
-     <h3>Edit your Listings detail</h3>
-    <form method="post" 
-    action="/listings/<%= listing._id %>?_method=PUT" 
-    
-        novalidate class="needs-validation"
-        enctype="multipart/form-data">
-       <div class="mb-3">
-            <label for="title" class="form-label">title</label>
-            <input name="listing[title]" type="text" value="<%= listing.title  %>" class="form-control" required>
-            <div class="invalid-feedback">
-      Title should be required
+  <div class="row my-4">
+    <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
+      <div class="form-card p-4 p-md-5 border rounded-4 bg-white shadow-sm">
+        <h3 class="mb-4 fw-bold">Edit your Listing</h3>
+        
+        <form method="post" action="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation" enctype="multipart/form-data">
+          
+          <!-- SECTION 1: Property Information -->
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-3"><i class="fa-regular fa-id-card me-2 text-brand"></i>Property Information</h5>
+            <div class="row g-3">
+              <!-- Title -->
+              <div class="col-md-8">
+                <label for="title" class="form-label fw-semibold">Property Title</label>
+                <input name="listing[title]" id="title" type="text" value="<%= listing.title %>" class="form-control py-2" required>
+                <div class="invalid-feedback">Title is required.</div>
+              </div>
+
+              <!-- Property Type -->
+              <div class="col-md-4">
+                <label for="propertyType" class="form-label fw-semibold">Property Type</label>
+                <select name="listing[propertyType]" id="propertyType" class="form-select py-2">
+                  <% const types = ["Entire home", "Villa", "Cottage", "Apartment", "Modern Loft", "Cabin", "Chalet", "Treehouse", "Farmhouse", "Beachfront Bungalow"]; %>
+                  <% for(let t of types) { %>
+                    <option value="<%= t %>" <%= (listing.propertyType === t) ? 'selected' : '' %>><%= t %></option>
+                  <% } %>
+                </select>
+              </div>
+
+              <!-- Description -->
+              <div class="col-12">
+                <label for="description" class="form-label fw-semibold">The space / Description</label>
+                <textarea name="listing[description]" id="description" rows="4" class="form-control" required><%= listing.description %></textarea>
+                <div class="invalid-feedback">Please enter a description.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 2: Room Specs & Capacity -->
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-bed me-2 text-brand"></i>Room Specs &amp; Capacity</h5>
+            <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <label for="guests" class="form-label fw-semibold">Max Guests</label>
+                <input type="number" name="listing[guests]" id="guests" min="1" max="16" value="<%= listing.guests || 2 %>" class="form-control" required>
+                <small class="text-muted d-block mt-1" style="font-size: 0.72rem;">(Max 2 adults/room)</small>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <label for="bedrooms" class="form-label fw-semibold">Bedrooms</label>
+                <input type="number" name="listing[bedrooms]" id="bedrooms" min="1" max="20" value="<%= listing.bedrooms || 1 %>" class="form-control" required>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <label for="beds" class="form-label fw-semibold">Beds</label>
+                <input type="number" name="listing[beds]" id="beds" min="1" max="30" value="<%= listing.beds || 1 %>" class="form-control" required>
+              </div>
+
+              <div class="col-6 col-md-3">
+                <label for="bathrooms" class="form-label fw-semibold">Bathrooms</label>
+                <input type="number" name="listing[bathrooms]" id="bathrooms" min="1" max="20" value="<%= listing.bathrooms || 1 %>" class="form-control" required>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 3: Pricing, Images, Location -->
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-location-dot me-2 text-brand"></i>Location &amp; Pricing</h5>
+            <div class="row g-3">
+              <!-- Original Image Preview -->
+              <% if(originalImage){ %>
+                <div class="col-12">
+                  <label class="form-label d-block text-muted small fw-semibold">Current Cover Image</label>
+                  <img src="<%= originalImage %>" class="img-thumbnail rounded-3" style="max-height: 180px; width: auto;" alt="Current Image">
+                </div>
+              <% } %>
+
+              <!-- New Image -->
+              <div class="col-12">
+                <label for="image" class="form-label fw-semibold">Upload New Cover Image (optional)</label>
+                <input name="listing[image]" id="image" type="file" class="form-control py-2" accept="image/*">
+              </div>
+
+              <!-- Price -->
+              <div class="col-md-4">
+                <label for="price" class="form-label fw-semibold">Price / Night (&#8377;)</label>
+                <input type="number" name="listing[price]" id="price" min="0" value="<%= listing.price %>" class="form-control py-2" required>
+                <div class="invalid-feedback">Valid price is required.</div>
+              </div>
+
+              <!-- Location -->
+              <div class="col-md-4">
+                <label for="location" class="form-label fw-semibold">Location / City</label>
+                <input name="listing[location]" id="location" type="text" value="<%= listing.location %>" class="form-control py-2" required>
+                <div class="invalid-feedback">Location is required.</div>
+              </div>
+
+              <!-- Country -->
+              <div class="col-md-4">
+                <label for="country" class="form-label fw-semibold">Country</label>
+                <input name="listing[country]" id="country" value="<%= listing.country %>" type="text" class="form-control py-2" required>
+                <div class="invalid-feedback">Country is required.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SECTION 4: What this place offers (Amenities) -->
+          <%
+            const hasAmenity = (name) => {
+              if (!listing.amenities) return false;
+              return listing.amenities.some(a => a.name.toLowerCase().includes(name.toLowerCase()) && a.available);
+            };
+            const isUnavailable = (name) => {
+              if (!listing.amenities) return false;
+              return listing.amenities.some(a => a.name.toLowerCase().includes(name.toLowerCase()) && !a.available);
+            };
+          %>
+          <div class="mb-4 pb-3 border-bottom">
+            <h5 class="fw-bold mb-1"><i class="fa-solid fa-wand-magic-sparkles me-2 text-brand"></i>What this place offers</h5>
+            <p class="text-muted small mb-3">Update the available facilities and safety disclosures.</p>
+
+            <div class="row g-2 mb-3">
+              <!-- Standard Amenities -->
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Wifi|fa-solid fa-wifi|true" id="edit_wifi" <%= hasAmenity("wifi") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_wifi">
+                    <i class="fa-solid fa-wifi text-secondary me-2" style="width: 20px;"></i> Wifi
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Free parking on premises|fa-solid fa-square-parking|true" id="edit_parking" <%= hasAmenity("parking") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_parking">
+                    <i class="fa-solid fa-square-parking text-secondary me-2" style="width: 20px;"></i> Free parking on premises
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Pets allowed|fa-solid fa-paw|true" id="edit_pets" <%= hasAmenity("pets") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_pets">
+                    <i class="fa-solid fa-paw text-secondary me-2" style="width: 20px;"></i> Pets allowed
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Air conditioning|fa-solid fa-snowflake|true" id="edit_ac" <%= hasAmenity("air conditioning") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_ac">
+                    <i class="fa-solid fa-snowflake text-secondary me-2" style="width: 20px;"></i> Air conditioning
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Private patio or balcony|fa-solid fa-door-open|true" id="edit_patio" <%= hasAmenity("patio") || hasAmenity("balcony") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_patio">
+                    <i class="fa-solid fa-door-open text-secondary me-2" style="width: 20px;"></i> Private patio or balcony
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Private back garden – Fully fenced|fa-solid fa-tree|true" id="edit_garden" <%= hasAmenity("garden") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_garden">
+                    <i class="fa-solid fa-tree text-secondary me-2" style="width: 20px;"></i> Private back garden – Fully fenced
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Bluetooth sound system|fa-solid fa-radio|true" id="edit_sound" <%= hasAmenity("sound") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_sound">
+                    <i class="fa-solid fa-radio text-secondary me-2" style="width: 20px;"></i> Bluetooth sound system
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Kitchen|fa-solid fa-kitchen-set|true" id="edit_kitchen" <%= hasAmenity("kitchen") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_kitchen">
+                    <i class="fa-solid fa-kitchen-set text-secondary me-2" style="width: 20px;"></i> Kitchen
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Dedicated workspace|fa-solid fa-laptop|true" id="edit_desk" <%= hasAmenity("workspace") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_desk">
+                    <i class="fa-solid fa-laptop text-secondary me-2" style="width: 20px;"></i> Dedicated workspace
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Swimming pool|fa-solid fa-water-ladder|true" id="edit_pool" <%= hasAmenity("pool") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center" for="edit_pool">
+                    <i class="fa-solid fa-water-ladder text-secondary me-2" style="width: 20px;"></i> Swimming pool
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!-- Safety Disclosures -->
+            <h6 class="fw-bold small text-muted text-uppercase tracking-wide mb-2 mt-3">Safety &amp; Disclosures</h6>
+            <div class="row g-2">
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Carbon monoxide alarm|fa-solid fa-triangle-exclamation|false" id="edit_co" <%= isUnavailable("carbon monoxide") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center text-muted" for="edit_co">
+                    <i class="fa-solid fa-triangle-exclamation text-warning me-2" style="width: 20px;"></i> Unavailable: Carbon monoxide alarm
+                  </label>
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <div class="form-check p-2 border rounded-3 bg-light d-flex align-items-center gap-2">
+                  <input class="form-check-input ms-1 me-2" type="checkbox" name="amenities[]" value="Smoke alarm|fa-solid fa-ban|false" id="edit_smoke" <%= isUnavailable("smoke") ? 'checked' : '' %>>
+                  <label class="form-check-label w-100 cursor-pointer d-flex align-items-center text-muted" for="edit_smoke">
+                    <i class="fa-solid fa-ban text-danger me-2" style="width: 20px;"></i> Unavailable: Smoke alarm
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2">
+            <button class="btn btn-brand px-4 py-3 fw-bold rounded-pill flex-grow-1 shadow-sm">
+              <i class="fa-solid fa-check me-1"></i> Save Changes
+            </button>
+            <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary px-4 py-3 rounded-pill fw-semibold">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
     </div>
-        </div>
-        <div class="mb-3">
-            <label for="description" class="form-label">Description</label>
-            <textarea name="listing[description]" type="text" placeholder="add description" class="form-control" required><%= listing.description  %></textarea>
-             <div class="invalid-feedback">
-      Please enter a short Description
-    </div>
-        </div>
-         <div class="mb-3 " >
-            Original Image <br>
-            <img src="<%= originalImage %>" width="250" >
-        </div>
-    
-        <div class="mb-3">
-            <label for="image" class="form-label">Upload New Image</label>
-            <input name="listing[image]" 
-            type="file"
-            class="form-control" >
-             
-        </div>
-        <div class="row">
-             <div class="mb-3 col-md-4" >
-            <label for="price" class="form-label"> Price</label>
-            <input type="number" name="listing[price]" value="<%= listing.price  %>" class="form-control" required>
-             <div class="invalid-feedback">
-      Price should be valid
-    </div>
-        </div>
-         <div class="mb-3 col-md-8">
-            <label for="Country" class="form-label">Country</label>
-            <input name="listing[country]" value="<%= listing.country  %>" type="text" class="form-control" required>
-             <div class="invalid-feedback">
-      Country should be valid
-    </div>
-        </div>
-        </div>
-        <div class="mb-3">
-            <label for="location" class="form-label">Location</label>
-            <input name="listing[location]" type="text" value="<%= listing.location %>" class="form-control" required>
-             <div class="invalid-feedback">
-      Location should be valid
-    </div>
-        </div>
-        <button class="btn btn-dark add-btn mt-3 " class="mb-3">Edit</button>
-    </form>
+  </div>
 </body>

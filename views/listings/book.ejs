@@ -1,0 +1,679 @@
+<% layout("/layout/boilerplate") -%>
+<body>
+  <div class="book-container py-4">
+    <!-- Breadcrumb / Back Link -->
+    <div class="mb-3">
+      <a href="/listings/<%= listing._id %>" class="btn btn-sm btn-outline-secondary rounded-pill px-3">
+        <i class="fa-solid fa-chevron-left me-1"></i> Back to Listing
+      </a>
+    </div>
+
+    <div class="row g-5">
+      <!-- LEFT COLUMN: Booking Details & Policies -->
+      <div class="col-lg-7">
+        <div class="booking-header mb-4">
+          <h2 class="fw-bold text-dark">Confirm and pay</h2>
+          <p class="text-muted">Review your reservation details and complete your stay</p>
+        </div>
+
+        <!-- Non-Refundable Policy Card -->
+        <div class="cancellation-policy-card mb-4 p-3 rounded-4 border bg-light shadow-sm">
+          <div class="d-flex align-items-start gap-3">
+            <div class="policy-icon-wrapper">
+              <i class="fa-solid fa-shield-halved text-danger fs-4"></i>
+            </div>
+            <div class="flex-grow-1">
+              <div class="fw-bold fs-6 text-dark mb-1">
+                This reservation is non-refundable. 
+                <a href="#fullPolicyModal" data-bs-toggle="modal" class="text-decoration-underline text-dark fw-bold">Full policy</a>
+              </div>
+              <p class="text-muted small mb-0">
+                Cancel before check-in for no refund. If the host cancels, you will receive a 100% refund.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Your Trip Section -->
+        <div class="trip-section border-top pt-4 mb-4">
+          <h4 class="fw-bold mb-3">Your trip</h4>
+
+          <!-- Dates Row -->
+          <div class="trip-item-box p-3 rounded-3 border mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="fw-bold mb-1">Dates</h6>
+                <div class="text-secondary" id="displayDatesText">18–19 Sept 2026</div>
+              </div>
+              <button type="button" class="btn btn-link text-dark fw-bold text-decoration-underline" id="toggleDatesBtn">
+                Change
+              </button>
+            </div>
+
+            <!-- Expandable Date Picker & Stay Length Controls -->
+            <div class="dates-edit-panel mt-3 pt-3 border-top" id="datesEditPanel" style="display: none;">
+              <!-- Quick Select Nights Pills -->
+              <label class="form-label small fw-bold text-muted mb-2">How many days stay? Select days:</label>
+              <div class="d-flex flex-wrap gap-2 mb-3">
+                <button type="button" class="btn btn-sm btn-dark stay-pill active" data-days="1">1 night</button>
+                <button type="button" class="btn btn-sm btn-outline-dark stay-pill" data-days="2">2 nights</button>
+                <button type="button" class="btn btn-sm btn-outline-dark stay-pill" data-days="3">3 nights</button>
+                <button type="button" class="btn btn-sm btn-outline-dark stay-pill" data-days="5">5 nights</button>
+                <button type="button" class="btn btn-sm btn-outline-dark stay-pill" data-days="7">7 nights</button>
+                <button type="button" class="btn btn-sm btn-outline-dark stay-pill" data-days="14">14 nights</button>
+              </div>
+
+              <!-- Manual Check-in and Check-out Pickers -->
+              <div class="row g-2">
+                <div class="col-sm-6">
+                  <label class="form-label small text-muted">Check-in Date</label>
+                  <input type="date" id="inputCheckIn" class="form-control" value="<%= checkIn %>">
+                </div>
+                <div class="col-sm-6">
+                  <label class="form-label small text-muted">Check-out Date</label>
+                  <input type="date" id="inputCheckOut" class="form-control" value="<%= checkOut %>">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Guests Row -->
+          <div class="trip-item-box p-3 rounded-3 border mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <h6 class="fw-bold mb-1">Guests</h6>
+                <div class="text-secondary" id="displayGuestsText">1 adult</div>
+              </div>
+              <button type="button" class="btn btn-link text-dark fw-bold text-decoration-underline" id="toggleGuestsBtn">
+                Change
+              </button>
+            </div>
+
+            <!-- Expandable Guests Selector -->
+            <div class="guests-edit-panel mt-3 pt-3 border-top" id="guestsEditPanel" style="display: none;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <div>
+                  <div class="fw-bold">Adults</div>
+                  <small class="text-muted">Age 13+ &bull; <strong>Max 2 adults per room</strong></small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle counter-btn" id="adultMinusBtn" style="width: 32px; height: 32px;" disabled>-</button>
+                  <span class="fw-bold px-2" id="adultCountDisplay">1</span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle counter-btn" id="adultPlusBtn" style="width: 32px; height: 32px;">+</button>
+                </div>
+              </div>
+              <div class="alert alert-warning py-1 px-2 small mb-3 mt-1" id="adultMaxNotice" style="display: none; font-size: 0.78rem;">
+                <i class="fa-solid fa-circle-info me-1"></i> Only 2 adults can stay in one room.
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center">
+                <div>
+                  <div class="fw-bold">Children</div>
+                  <small class="text-muted">Ages 0–12</small>
+                </div>
+                <div class="d-flex align-items-center gap-2">
+                  <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle counter-btn" id="childMinusBtn" style="width: 32px; height: 32px;">-</button>
+                  <span class="fw-bold px-2" id="childCountDisplay">0</span>
+                  <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle counter-btn" id="childPlusBtn" style="width: 32px; height: 32px;">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Ground Rules Notice -->
+        <div class="border-top pt-4 mb-4">
+          <h5 class="fw-bold mb-2">Ground rules</h5>
+          <p class="text-muted small mb-2">
+            We ask every guest to remember a few simple things about what makes a great guest:
+          </p>
+          <ul class="text-muted small ps-3 mb-0">
+            <li>Follow the house rules and respect quiet hours</li>
+            <li>Treat your Host's home like your own</li>
+          </ul>
+        </div>
+
+        <!-- Booking Form Submission via Razorpay -->
+        <form action="/listings/<%= listing._id %>/book" method="post" id="checkoutForm">
+          <input type="hidden" name="booking[checkIn]" id="formCheckIn" value="<%= checkIn %>">
+          <input type="hidden" name="booking[checkOut]" id="formCheckOut" value="<%= checkOut %>">
+          <input type="hidden" name="booking[nights]" id="formNights" value="<%= nights %>">
+          <input type="hidden" name="booking[guests]" id="formGuests" value="<%= guests %>">
+          <input type="hidden" name="booking[adults]" id="formAdults" value="1">
+
+          <button type="button" id="payRazorpayBtn" class="btn btn-brand w-100 py-3 fw-bold fs-5 shadow rounded-pill mb-2">
+            <i class="fa-solid fa-lock me-2"></i> Pay with Razorpay
+          </button>
+          
+          <div class="d-flex align-items-center justify-content-center gap-2 text-muted small mb-3">
+            <i class="fa-solid fa-shield-halved text-success"></i>
+            <span>Guaranteed Safe &amp; Secure Checkout via <strong>Razorpay</strong></span>
+          </div>
+        </form>
+
+        <p class="text-center text-muted small">
+          By selecting the button above, you agree to the Host's House Rules, Ground rules for guests, and Wanderlust Terms of Service.
+        </p>
+      </div>
+
+      <!-- RIGHT COLUMN: Sticky Summary & Price Details Card -->
+      <div class="col-lg-5">
+        <div class="booking-summary-card p-4 rounded-4 border bg-white shadow-sm sticky-top" style="top: 6rem;">
+          <!-- Listing Mini Preview -->
+          <div class="d-flex gap-3 mb-4 pb-3 border-bottom">
+            <img 
+              src="<%= listing.image && listing.image.url ? listing.image.url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=400&q=60' %>" 
+              alt="<%= listing.title %>"
+              class="rounded-3"
+              style="width: 105px; height: 105px; object-fit: cover;"
+            >
+            <div>
+              <span class="badge bg-light text-secondary border mb-1">Entire home</span>
+              <h6 class="fw-bold mb-1 text-truncate-2"><%= listing.title %></h6>
+              <div class="small text-muted mb-1"><i class="fa-solid fa-location-dot me-1 text-danger"></i><%= listing.location %>, <%= listing.country %></div>
+              <div class="small"><i class="fa-solid fa-star text-warning me-1"></i>4.8 <span class="text-muted">(Reviews)</span></div>
+            </div>
+          </div>
+
+          <!-- Price Details Title -->
+          <h5 class="fw-bold mb-3">Price details</h5>
+
+          <!-- Base Calculation Row -->
+          <div class="d-flex justify-content-between mb-2">
+            <span id="priceNightsLabel" class="text-secondary">1 night x &#8377;<%= pricePerNight.toLocaleString("en-IN") %>.00</span>
+            <span id="priceBaseAmount" class="fw-semibold">&#8377;<%= basePrice.toLocaleString("en-IN") %>.00</span>
+          </div>
+
+          <!-- Taxes Row -->
+          <div class="d-flex justify-content-between mb-3">
+            <span class="text-secondary">Taxes</span>
+            <span id="priceTaxesAmount" class="fw-semibold">&#8377;<%= taxes.toLocaleString("en-IN") %>.00</span>
+          </div>
+
+          <hr class="my-3">
+
+          <!-- Total INR Row -->
+          <div class="d-flex justify-content-between align-items-baseline mb-3">
+            <div>
+              <div class="fw-bold fs-5">Total</div>
+              <small class="text-muted">INR</small>
+            </div>
+            <div class="fw-bold fs-4 text-brand" id="priceTotalAmount">&#8377;<%= total.toLocaleString("en-IN") %>.00</div>
+          </div>
+
+          <!-- Price breakdown Dropdown -->
+          <div class="accordion accordion-flush" id="priceBreakdownAccordion">
+            <div class="accordion-item border-0">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed px-0 py-2 bg-transparent text-secondary small fw-bold" type="button" data-bs-toggle="collapse" data-bs-target="#breakdownDetails">
+                  <i class="fa-solid fa-circle-info me-2 text-danger"></i> Price breakdown
+                </button>
+              </h2>
+              <div id="breakdownDetails" class="accordion-collapse collapse" data-bs-parent="#priceBreakdownAccordion">
+                <div class="accordion-body px-0 pt-2 pb-0 small text-muted">
+                  <div class="d-flex justify-content-between mb-1">
+                    <span>Nightly rate:</span>
+                    <span id="breakdownNightly">&#8377;<%= pricePerNight.toLocaleString("en-IN") %>.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span>Stay length:</span>
+                    <span id="breakdownNights">1 night</span>
+                  </div>
+                  <div class="d-flex justify-content-between mb-1">
+                    <span>Goods & Services Tax (18% GST):</span>
+                    <span id="breakdownGst">&#8377;<%= taxes.toLocaleString("en-IN") %>.00</span>
+                  </div>
+                  <div class="d-flex justify-content-between pt-1 border-top fw-bold text-dark">
+                    <span>All-inclusive total:</span>
+                    <span id="breakdownTotal">&#8377;<%= total.toLocaleString("en-IN") %>.00</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Full Policy Modal -->
+  <div class="modal fade" id="fullPolicyModal" tabindex="-1" aria-labelledby="fullPolicyModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 p-3">
+        <div class="modal-header border-0 pb-0">
+          <h5 class="modal-title fw-bold" id="fullPolicyModalLabel">Cancellation policy</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="badge bg-danger-subtle text-danger mb-3 p-2 px-3 rounded-pill fw-semibold">
+            Non-refundable reservation
+          </div>
+          <p class="text-secondary mb-3">
+            This reservation is non-refundable. If you cancel, you won't receive a refund. This host offers a special discounted rate for non-refundable bookings.
+          </p>
+          <hr>
+          <h6 class="fw-bold mb-2">Host cancellation</h6>
+          <p class="text-secondary small mb-0">
+            If your host cancels your reservation for any reason, you are entitled to a full 100% refund, or assistance with rebooking another stay.
+          </p>
+        </div>
+        <div class="modal-footer border-0 pt-0">
+          <button type="button" class="btn btn-dark w-100 rounded-pill py-2" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Razorpay Official Checkout SDK -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Realtime Dynamic Calculation Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const pricePerNight = <%= pricePerNight %>;
+      let adultsCount = 1;
+      let childrenCount = 0;
+
+      // DOM Elements
+      const inputCheckIn = document.getElementById("inputCheckIn");
+      const inputCheckOut = document.getElementById("inputCheckOut");
+      const formCheckIn = document.getElementById("formCheckIn");
+      const formCheckOut = document.getElementById("formCheckOut");
+      const formNights = document.getElementById("formNights");
+      const formGuests = document.getElementById("formGuests");
+
+      const displayDatesText = document.getElementById("displayDatesText");
+      const displayGuestsText = document.getElementById("displayGuestsText");
+
+      const toggleDatesBtn = document.getElementById("toggleDatesBtn");
+      const datesEditPanel = document.getElementById("datesEditPanel");
+      const toggleGuestsBtn = document.getElementById("toggleGuestsBtn");
+      const guestsEditPanel = document.getElementById("guestsEditPanel");
+
+      const stayPills = document.querySelectorAll(".stay-pill");
+
+      const priceNightsLabel = document.getElementById("priceNightsLabel");
+      const priceBaseAmount = document.getElementById("priceBaseAmount");
+      const priceTaxesAmount = document.getElementById("priceTaxesAmount");
+      const priceTotalAmount = document.getElementById("priceTotalAmount");
+
+      const breakdownNightly = document.getElementById("breakdownNightly");
+      const breakdownNights = document.getElementById("breakdownNights");
+      const breakdownGst = document.getElementById("breakdownGst");
+      const breakdownTotal = document.getElementById("breakdownTotal");
+
+      // Counters
+      const adultMinusBtn = document.getElementById("adultMinusBtn");
+      const adultPlusBtn = document.getElementById("adultPlusBtn");
+      const adultCountDisplay = document.getElementById("adultCountDisplay");
+      const childMinusBtn = document.getElementById("childMinusBtn");
+      const childPlusBtn = document.getElementById("childPlusBtn");
+      const childCountDisplay = document.getElementById("childCountDisplay");
+
+      // Toggle Panels
+      toggleDatesBtn.addEventListener("click", () => {
+        const isHidden = datesEditPanel.style.display === "none";
+        datesEditPanel.style.display = isHidden ? "block" : "none";
+        toggleDatesBtn.textContent = isHidden ? "Done" : "Change";
+      });
+
+      toggleGuestsBtn.addEventListener("click", () => {
+        const isHidden = guestsEditPanel.style.display === "none";
+        guestsEditPanel.style.display = isHidden ? "block" : "none";
+        toggleGuestsBtn.textContent = isHidden ? "Done" : "Change";
+      });
+
+      // Format Date display
+      function formatDateDisplay(d1, d2) {
+        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+        const day1 = d1.getDate();
+        const day2 = d2.getDate();
+        const m1 = months[d1.getMonth()];
+        const m2 = months[d2.getMonth()];
+        const y1 = d1.getFullYear();
+        const y2 = d2.getFullYear();
+
+        if (m1 === m2 && y1 === y2) {
+          return `${day1}–${day2} ${m1} ${y1}`;
+        }
+        return `${day1} ${m1} – ${day2} ${m2} ${y2}`;
+      }
+
+      function updateCalculations() {
+        let d1 = new Date(inputCheckIn.value);
+        let d2 = new Date(inputCheckOut.value);
+
+        if (isNaN(d1.getTime()) || isNaN(d2.getTime()) || d2 <= d1) {
+          d2 = new Date(d1);
+          d2.setDate(d2.getDate() + 1);
+          inputCheckOut.value = d2.toISOString().split("T")[0];
+        }
+
+        const diffTime = Math.abs(d2 - d1);
+        const nights = Math.max(1, Math.round(diffTime / (1000 * 60 * 60 * 24)));
+
+        const basePrice = pricePerNight * nights;
+        const taxes = Math.round(basePrice * 0.18);
+        const total = basePrice + taxes;
+
+        // Update hidden form inputs
+        formCheckIn.value = inputCheckIn.value;
+        formCheckOut.value = inputCheckOut.value;
+        formNights.value = nights;
+
+        // Update text displays
+        displayDatesText.textContent = formatDateDisplay(d1, d2);
+        priceNightsLabel.textContent = `${nights} night${nights > 1 ? 's' : ''} x ₹${pricePerNight.toLocaleString('en-IN')}.00`;
+        priceBaseAmount.textContent = `₹${basePrice.toLocaleString('en-IN')}.00`;
+        priceTaxesAmount.textContent = `₹${taxes.toLocaleString('en-IN')}.00`;
+        priceTotalAmount.textContent = `₹${total.toLocaleString('en-IN')}.00`;
+
+        // Update breakdown accordion
+        if (breakdownNightly) breakdownNightly.textContent = `₹${pricePerNight.toLocaleString('en-IN')}.00`;
+        if (breakdownNights) breakdownNights.textContent = `${nights} night${nights > 1 ? 's' : ''}`;
+        if (breakdownGst) breakdownGst.textContent = `₹${taxes.toLocaleString('en-IN')}.00`;
+        if (breakdownTotal) breakdownTotal.textContent = `₹${total.toLocaleString('en-IN')}.00`;
+
+        // Update active stay pill
+        stayPills.forEach(pill => {
+          if (parseInt(pill.dataset.days, 10) === nights) {
+            pill.classList.remove("btn-outline-dark");
+            pill.classList.add("btn-dark");
+          } else {
+            pill.classList.remove("btn-dark");
+            pill.classList.add("btn-outline-dark");
+          }
+        });
+      }
+
+      // Stay Pill Click Event
+      stayPills.forEach(pill => {
+        pill.addEventListener("click", () => {
+          const days = parseInt(pill.dataset.days, 10);
+          const currentCheckIn = new Date(inputCheckIn.value || "2026-09-18");
+          const newCheckOut = new Date(currentCheckIn);
+          newCheckOut.setDate(newCheckOut.getDate() + days);
+
+          inputCheckOut.value = newCheckOut.toISOString().split("T")[0];
+          updateCalculations();
+        });
+      });
+
+      inputCheckIn.addEventListener("change", () => {
+        const d1 = new Date(inputCheckIn.value);
+        const d2 = new Date(inputCheckOut.value);
+        if (d2 <= d1) {
+          const newOut = new Date(d1);
+          newOut.setDate(newOut.getDate() + 1);
+          inputCheckOut.value = newOut.toISOString().split("T")[0];
+        }
+        updateCalculations();
+      });
+
+      inputCheckOut.addEventListener("change", () => {
+        updateCalculations();
+      });
+
+      function updateGuestDisplay() {
+        const totalGuests = adultsCount + childrenCount;
+        let guestStr = `${adultsCount} adult${adultsCount > 1 ? 's' : ''}`;
+        if (childrenCount > 0) {
+          guestStr += `, ${childrenCount} child${childrenCount > 1 ? 'ren' : ''}`;
+        }
+        displayGuestsText.textContent = guestStr;
+        formGuests.value = totalGuests;
+
+        const formAdults = document.getElementById("formAdults");
+        if (formAdults) formAdults.value = adultsCount;
+
+        adultCountDisplay.textContent = adultsCount;
+        childCountDisplay.textContent = childrenCount;
+
+        adultMinusBtn.disabled = (adultsCount <= 1);
+        adultPlusBtn.disabled = (adultsCount >= 2);
+
+        const adultMaxNotice = document.getElementById("adultMaxNotice");
+        if (adultMaxNotice) {
+          adultMaxNotice.style.display = (adultsCount >= 2) ? "block" : "none";
+        }
+
+        childMinusBtn.disabled = (childrenCount <= 0);
+        childPlusBtn.disabled = (childrenCount >= 2);
+      }
+
+      adultMinusBtn.addEventListener("click", () => {
+        if (adultsCount > 1) {
+          adultsCount--;
+          updateGuestDisplay();
+        }
+      });
+
+      adultPlusBtn.addEventListener("click", () => {
+        if (adultsCount < 2) {
+          adultsCount++;
+          updateGuestDisplay();
+        }
+      });
+
+      childMinusBtn.addEventListener("click", () => {
+        if (childrenCount > 0) {
+          childrenCount--;
+          updateGuestDisplay();
+        }
+      });
+
+      childPlusBtn.addEventListener("click", () => {
+        if (childrenCount < 10) {
+          childrenCount++;
+          updateGuestDisplay();
+        }
+      });
+
+      // Initial run
+      updateCalculations();
+      updateGuestDisplay();
+
+      // ==========================================
+      // Razorpay Checkout Integration
+      // ==========================================
+      const payRazorpayBtn = document.getElementById("payRazorpayBtn");
+
+      if (payRazorpayBtn) {
+        payRazorpayBtn.addEventListener("click", async () => {
+          const originalBtnHtml = payRazorpayBtn.innerHTML;
+          payRazorpayBtn.disabled = true;
+          payRazorpayBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...`;
+
+          try {
+            // 1. Create order on server
+            const orderRes = await fetch("/listings/<%= listing._id %>/create-order", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                checkIn: formCheckIn.value,
+                checkOut: formCheckOut.value,
+                nights: formNights.value,
+                guests: formGuests.value,
+                adults: adultsCount,
+              }),
+            });
+
+            const orderData = await orderRes.json();
+            if (!orderData.success) {
+              alert(orderData.message || "Failed to initialize payment.");
+              payRazorpayBtn.disabled = false;
+              payRazorpayBtn.innerHTML = originalBtnHtml;
+              return;
+            }
+
+            // Function to verify payment with server
+            async function verifyAndComplete(paymentResponse) {
+              payRazorpayBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span> Verifying payment...`;
+              const verifyRes = await fetch("/listings/<%= listing._id %>/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  razorpay_order_id: paymentResponse.razorpay_order_id,
+                  razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                  razorpay_signature: paymentResponse.razorpay_signature,
+                  booking: {
+                    checkIn: formCheckIn.value,
+                    checkOut: formCheckOut.value,
+                    nights: formNights.value,
+                    guests: formGuests.value,
+                    adults: adultsCount,
+                  },
+                }),
+              });
+
+              const verifyData = await verifyRes.json();
+              if (verifyData.success) {
+                window.location.href = verifyData.redirectUrl || "/listings/<%= listing._id %>";
+              } else {
+                alert(verifyData.message || "Payment verification failed.");
+                payRazorpayBtn.disabled = false;
+                payRazorpayBtn.innerHTML = originalBtnHtml;
+              }
+            }
+
+            // 2. Open Razorpay modal if live SDK is available and key is configured
+            if (typeof Razorpay !== "undefined" && orderData.isRealOrder) {
+              const options = {
+                key: orderData.keyId,
+                amount: orderData.amount,
+                currency: orderData.currency || "INR",
+                name: "Wanderlust",
+                description: `Stay at ${orderData.listingTitle}`,
+                image: orderData.listingImage || "https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=400&q=60",
+                order_id: orderData.orderId,
+                prefill: {
+                  name: orderData.user.name,
+                  email: orderData.user.email,
+                  contact: "9999999999",
+                },
+                theme: {
+                  color: "#fe424d",
+                },
+                handler: function (response) {
+                  verifyAndComplete(response);
+                },
+                modal: {
+                  ondismiss: function () {
+                    payRazorpayBtn.disabled = false;
+                    payRazorpayBtn.innerHTML = originalBtnHtml;
+                  },
+                },
+              };
+
+              const rzp = new Razorpay(options);
+              rzp.on("payment.failed", function (failResponse) {
+                alert("Payment failed: " + failResponse.error.description);
+                payRazorpayBtn.disabled = false;
+                payRazorpayBtn.innerHTML = originalBtnHtml;
+              });
+              rzp.open();
+            } else {
+              // 3. Fallback / Test Simulation Checkout Modal (when Razorpay test keys are pending)
+              const simModalEl = document.getElementById("simulatedRazorpayModal");
+              const simAmountEl = document.getElementById("simModalAmount");
+              if (simAmountEl) simAmountEl.textContent = `₹${orderData.totalPrice.toLocaleString("en-IN")}.00`;
+
+              const simCompleteBtn = document.getElementById("simCompletePaymentBtn");
+              if (simCompleteBtn) {
+                simCompleteBtn.onclick = () => {
+                  const bsModal = bootstrap.Modal.getInstance(simModalEl);
+                  if (bsModal) bsModal.hide();
+                  verifyAndComplete({
+                    razorpay_order_id: orderData.orderId,
+                    razorpay_payment_id: "pay_sim_" + Date.now(),
+                    razorpay_signature: "simulated_signature",
+                  });
+                };
+              }
+
+              const modal = new bootstrap.Modal(simModalEl);
+              modal.show();
+              payRazorpayBtn.disabled = false;
+              payRazorpayBtn.innerHTML = originalBtnHtml;
+            }
+          } catch (err) {
+            console.error("Razorpay payment error:", err);
+            alert("An error occurred while connecting to payment gateway.");
+            payRazorpayBtn.disabled = false;
+            payRazorpayBtn.innerHTML = originalBtnHtml;
+          }
+        });
+      }
+    });
+  </script>
+
+  <!-- Simulated Razorpay Modal for Test Mode -->
+  <div class="modal fade" id="simulatedRazorpayModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+      <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+        <!-- Razorpay Header Bar -->
+        <div class="p-3 text-white d-flex justify-content-between align-items-center" style="background: linear-gradient(135deg, #0c2340 0%, #173b6c 100%);">
+          <div class="d-flex align-items-center gap-2">
+            <span class="fs-4 fw-bold tracking-tight" style="color: #3399cc;">R</span>
+            <span class="fw-bold fs-5">Razorpay</span>
+            <span class="badge bg-primary-subtle text-primary border ms-2 small">Test Mode</span>
+          </div>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-4 bg-white">
+          <div class="text-center mb-4">
+            <small class="text-muted text-uppercase tracking-wider">Amount to Pay</small>
+            <div class="fs-2 fw-bold text-dark" id="simModalAmount">&#8377;0.00</div>
+            <span class="badge bg-light text-secondary border">Wanderlust Stay Reservation</span>
+          </div>
+
+          <!-- Payment Methods -->
+          <div class="list-group mb-4">
+            <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3 active border-0 rounded-3 mb-2" style="background-color: #f0f7ff; color: #222;">
+              <input class="form-check-input flex-shrink-0" type="radio" name="simPayMethod" checked>
+              <i class="fa-solid fa-mobile-screen-button fs-4 text-primary"></i>
+              <div>
+                <div class="fw-bold">UPI / QR (Google Pay, PhonePe, Paytm)</div>
+                <small class="text-muted">Instant payment via any UPI app</small>
+              </div>
+            </label>
+
+            <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3 border rounded-3 mb-2">
+              <input class="form-check-input flex-shrink-0" type="radio" name="simPayMethod">
+              <i class="fa-regular fa-credit-card fs-4 text-danger"></i>
+              <div>
+                <div class="fw-bold">Cards (Credit / Debit)</div>
+                <small class="text-muted">Visa, Mastercard, RuPay</small>
+              </div>
+            </label>
+
+            <label class="list-group-item list-group-item-action d-flex align-items-center gap-3 p-3 border rounded-3">
+              <input class="form-check-input flex-shrink-0" type="radio" name="simPayMethod">
+              <i class="fa-solid fa-building-columns fs-4 text-success"></i>
+              <div>
+                <div class="fw-bold">Netbanking</div>
+                <small class="text-muted">All Indian major banks supported</small>
+              </div>
+            </label>
+          </div>
+
+          <button type="button" id="simCompletePaymentBtn" class="btn w-100 py-3 fw-bold text-white fs-6 shadow-sm rounded-3" style="background-color: #3399cc;">
+            <i class="fa-solid fa-check me-2"></i> Authorize &amp; Complete Payment
+          </button>
+        </div>
+
+        <div class="p-2 bg-light text-center border-top">
+          <small class="text-muted" style="font-size: 0.72rem;">
+            Secured by 256-bit encryption &bull; PCI-DSS Level 1 Compliant
+          </small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Official Razorpay Checkout Script -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>

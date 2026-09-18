@@ -1,44 +1,140 @@
 <% layout("/layout/boilerplate") -%>
+<body>
+  <div class="airbnb-signup-wrapper py-4">
+    <div class="airbnb-signup-card mx-auto p-4 p-md-5 bg-white rounded-4 border shadow-sm" style="max-width: 560px;">
+      <!-- Top Navigation Icons -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="javascript:history.back()" class="text-dark fs-5 p-1 text-decoration-none" title="Back">
+          <i class="fa-solid fa-arrow-left"></i>
+        </a>
+        <a href="/listings" class="text-dark fs-5 p-1 text-decoration-none" title="Close">
+          <i class="fa-solid fa-xmark"></i>
+        </a>
+      </div>
 
- <div class="row mt-3 col-8 offset-2 " >
-    <h1 class="col-8 offset-2 ">SignUp on Wanderlust</h1>
-        <div class="col-8 offset-2">
-            <form action="/signup" method="post" class="needs-validation" novalidate>
-                <div class="mb-3">
-                    <label for="username" class="form-label">Username</label>
-                    <input
-                      name="username"
-                      id="username"
-                      type="text"
-                      class="form-control"
-                      required>
-                     <div class="valid-feedback">Looks good</div>
-                </div>
-                 <div class="mb-3">
-                    <label for="email" class="form-label">Email</label>
-                    <input
-                      name="email"
-                      id="email"
-                      type="text"
-                      class="form-control"
-                      required>
-                     <div class="valid-feedback">Looks good</div>
-                </div>
-                 <div class="mb-3">
-                    <label for="password" class="form-label">Password</label>
-                    <input
-                      name="password"
-                      id="password"
-                      type="password"
-                      class="form-control"
-                      required>
-                     <div class="valid-feedback">Looks good</div>
-                </div>
-               <button class="btn btn-success  mt-3">Signup</button>
-               
-               
-            </form>
+      <!-- Header Titles -->
+      <div class="text-center mb-4">
+        <h3 class="fw-bold mb-1 text-dark">Let’s create your account</h3>
+        <p class="text-muted small mb-0">This information is required to book or host.</p>
+      </div>
 
+      <!-- Signup Form -->
+      <form action="/signup" method="post" class="needs-validation" novalidate>
+        <!-- 1. Legal Name Section -->
+        <div class="mb-3">
+          <label class="fw-bold text-dark mb-2">Legal name</label>
+          <div class="border rounded-3 overflow-hidden bg-white">
+            <div class="p-2 px-3 border-bottom">
+              <label for="firstName" class="form-label text-muted small mb-0" style="font-size: 0.75rem;">First name</label>
+              <input 
+                type="text" 
+                name="firstName" 
+                id="firstName" 
+                class="form-control border-0 p-0 shadow-none fw-semibold text-dark" 
+                placeholder="First name" 
+                required
+              >
+            </div>
+            <div class="p-2 px-3">
+              <label for="lastName" class="form-label text-muted small mb-0" style="font-size: 0.75rem;">Last name</label>
+              <input 
+                type="text" 
+                name="lastName" 
+                id="lastName" 
+                class="form-control border-0 p-0 shadow-none fw-semibold text-dark" 
+                placeholder="Last name" 
+                required
+              >
+            </div>
+          </div>
+          <div class="text-muted mt-2" style="font-size: 0.8rem; line-height: 1.35;">
+            Make sure it matches the name on your government ID. If you go by another name, you can <a href="#" class="text-dark text-decoration-underline">add a preferred first name</a>.
+          </div>
         </div>
-    
- </div>
+
+        <!-- 2. Date of Birth Section -->
+        <div class="mb-3">
+          <label class="fw-bold text-dark mb-2">Date of birth</label>
+          <div class="border rounded-3 p-2 px-3 bg-white">
+            <label for="dob" class="form-label text-muted small mb-0" style="font-size: 0.75rem;">Select a date</label>
+            <input 
+              type="date" 
+              name="dob" 
+              id="dob" 
+              class="form-control border-0 p-0 shadow-none fw-semibold text-dark" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- 3. Email Section -->
+        <div class="mb-3">
+          <label class="fw-bold text-dark mb-2">Email</label>
+          <div class="border rounded-3 p-2 px-3 bg-white mb-2">
+            <label for="email" class="form-label text-muted small mb-0" style="font-size: 0.75rem;">Email</label>
+            <input 
+              type="email" 
+              name="email" 
+              id="email" 
+              class="form-control border-0 p-0 shadow-none fw-semibold text-dark" 
+              placeholder="name@example.com" 
+              required
+            >
+          </div>
+          <div class="text-muted" style="font-size: 0.8rem;">We’ll email you trip confirmations and receipts.</div>
+          <div class="text-muted mt-1" style="font-size: 0.8rem;">All pre-filled information came from Google.</div>
+        </div>
+
+        <!-- 4. Password Section -->
+        <div class="mb-4">
+          <label class="fw-bold text-dark mb-2">Password</label>
+          <div class="border rounded-3 p-2 px-3 bg-white">
+            <label for="password" class="form-label text-muted small mb-0" style="font-size: 0.75rem;">Create password</label>
+            <input 
+              type="password" 
+              name="password" 
+              id="password" 
+              class="form-control border-0 p-0 shadow-none fw-semibold text-dark" 
+              placeholder="Create a password" 
+              minlength="4" 
+              required
+            >
+          </div>
+        </div>
+
+        <!-- 5. Promotions Card -->
+        <div class="p-3 rounded-3 mb-4 border" style="background-color: #f7f7f7;">
+          <p class="text-secondary mb-3" style="font-size: 0.85rem; line-height: 1.4;">
+            Wanderlust will send you promotions such as deals and marketing notifications. You can opt out at any time via account settings or within marketing emails.
+          </p>
+          <div class="d-flex justify-content-between align-items-center">
+            <label class="form-check-label text-dark" for="promoOptOut" style="font-size: 0.88rem;">
+              I don’t want to receive Wanderlust promotions.
+            </label>
+            <input 
+              class="form-check-input ms-2" 
+              type="checkbox" 
+              name="promotionsOptOut" 
+              id="promoOptOut" 
+              style="width: 1.3rem; height: 1.3rem; cursor: pointer;"
+            >
+          </div>
+        </div>
+
+        <!-- 6. Legal Agreement Disclaimer -->
+        <p class="text-muted mb-4" style="font-size: 0.78rem; line-height: 1.45;">
+          By selecting <strong>Agree and continue</strong>, I agree to Wanderlust’s <a href="#" class="text-dark fw-bold text-decoration-underline">Terms of Service</a>, <a href="#" class="text-dark fw-bold text-decoration-underline">Payments Terms of Service</a> and <a href="#" class="text-dark fw-bold text-decoration-underline">Nondiscrimination Policy</a>, and acknowledge the <a href="#" class="text-dark fw-bold text-decoration-underline">Privacy Policy</a>.
+        </p>
+
+        <!-- 7. Submit Button -->
+        <button type="submit" class="btn btn-brand w-100 py-3 fw-bold rounded-3 fs-6 shadow-sm mb-3">
+          Agree and continue
+        </button>
+
+        <div class="text-center text-muted small">
+          Already have an account? <a href="/login" class="text-decoration-none fw-bold text-danger">Log in</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</body>

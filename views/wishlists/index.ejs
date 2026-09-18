@@ -1,0 +1,104 @@
+<% layout("./layout/boilerplate") %>
+
+<div class="container my-4 my-md-5">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="fw-bold mb-1" style="font-size: 2.2rem;">Wishlists</h1>
+      <p class="text-muted small mb-0">Saved homes, villas, and hotels you love</p>
+    </div>
+    <div>
+      <a href="/listings" class="btn btn-outline-dark rounded-pill px-4 fw-semibold">
+        <i class="fa-solid fa-compass me-1"></i> Explore More Stays
+      </a>
+    </div>
+  </div>
+
+  <% if (!wishlistListings || wishlistListings.length === 0) { %>
+    <!-- Empty Wishlist State -->
+    <div class="text-center py-5 my-4 border rounded-4 bg-white shadow-sm p-4">
+      <div class="mb-3">
+        <div class="rounded-circle bg-danger-subtle text-danger d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px;">
+          <i class="fa-regular fa-heart fs-1"></i>
+        </div>
+      </div>
+      <h3 class="fw-bold mb-2">Create your first wishlist</h3>
+      <p class="text-muted mb-4" style="max-width: 440px; margin: 0 auto;">
+        As you search, tap the heart icon on any hotel, luxury stay, or villa to save your favourites here.
+      </p>
+      <!-- 'Get started' redirects to home page (/listings) -->
+      <a href="/listings" class="btn btn-brand rounded-pill px-5 py-3 fw-bold fs-6 shadow-sm">
+        Get started
+      </a>
+    </div>
+  <% } else { %>
+
+    <!-- Airbnb Collage Box (Matching Screenshot 1) -->
+    <div class="row g-4 mb-5">
+      <div class="col-md-5 col-lg-4 col-xl-3">
+        <div class="wishlist-folder-card p-3 border rounded-4 bg-white shadow-sm h-100" style="cursor: pointer;">
+          <!-- 4-Grid Thumbnail Collage -->
+          <div class="collage-grid rounded-3 overflow-hidden mb-3" style="aspect-ratio: 1; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 3px; background-color: #eaeaea;">
+            <% for(let i = 0; i < 4; i++) { %>
+              <div style="background-color: #cfcfcf; overflow: hidden; height: 100%;">
+                <% if(wishlistListings[i] && wishlistListings[i].image && wishlistListings[i].image.url) { %>
+                  <img src="<%= wishlistListings[i].image.url %>" alt="<%= wishlistListings[i].title %>" style="width: 100%; height: 100%; object-fit: cover;">
+                <% } else { %>
+                  <div class="w-100 h-100 d-flex align-items-center justify-content-center text-muted" style="background-color: #888888;">
+                    <i class="fa-regular fa-image fs-5 text-white-50"></i>
+                  </div>
+                <% } %>
+              </div>
+            <% } %>
+          </div>
+
+          <h5 class="fw-bold mb-1 text-dark">Recently viewed</h5>
+          <p class="text-muted small mb-0"><%= wishlistListings.length %> stay<%= wishlistListings.length > 1 ? 's' : '' %> saved</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liked Hotels Grid -->
+    <div class="border-top pt-4">
+      <h3 class="fw-bold mb-4">Saved stays</h3>
+      <div class="row row-cols-xxl-4 row-cols-lg-3 row-cols-md-2 row-cols-1 g-4">
+        <% for(let listing of wishlistListings) { %>
+          <div class="col" id="wishlistCard-<%= listing._id %>">
+            <div class="card listing-card h-100 border shadow-sm rounded-4 overflow-hidden position-relative">
+              <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
+                <div class="card-img-wrapper position-relative" style="height: 240px; overflow: hidden;">
+                  <img 
+                    src="<%= listing.image && listing.image.url ? listing.image.url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=800&q=60' %>" 
+                    class="w-100 h-100 object-fit-cover" 
+                    alt="<%= listing.title %>"
+                  >
+                  <!-- Unlike / Remove button -->
+                  <button 
+                    class="wishlist-btn active" 
+                    type="button" 
+                    title="Remove from wishlist" 
+                    onclick="event.preventDefault(); toggleWishlistHeart('<%= listing._id %>', this);"
+                  >
+                    <i class="fa-solid fa-heart text-danger"></i>
+                  </button>
+                </div>
+
+                <div class="card-body p-3">
+                  <div class="d-flex justify-content-between align-items-baseline mb-1">
+                    <span class="fw-bold text-truncate" style="max-width: 75%;"><%= listing.title %></span>
+                    <span class="small text-muted"><i class="fa-solid fa-star text-warning"></i> 4.88</span>
+                  </div>
+                  <div class="text-muted small mb-2">
+                    <i class="fa-solid fa-location-dot text-danger me-1"></i> <%= listing.location %>, <%= listing.country %>
+                  </div>
+                  <div class="fw-bold text-dark">
+                    &#8377; <%= listing.price ? listing.price.toLocaleString("en-IN") : 0 %> <span class="fw-normal text-muted small">/ night</span>
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+</div>

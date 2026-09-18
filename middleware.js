@@ -1,13 +1,12 @@
-const Listing = require("./models/listing");
-const Review= require("./models/review.js");
+const Listing = require("./models/listing.js");
+const Review = require("./models/review.js");
 const ExpressError = require("./utils/expressError.js");
-const {listingSchema}= require("./schema.js");
-const {reviewSchema}= require("./schema.js");
+const { listingSchema, reviewSchema } = require("./schema.js");
 
 module.exports.isLoggedIn = (req, res, next) => {
   if (!req.isAuthenticated()) {
     req.session.redirectUrl = req.originalUrl;
-    req.flash("error", "You must be logged in to create a listing");
+    req.flash("error", "You must be logged in to perform this action");
     return res.redirect("/login");
   }
   next();
@@ -29,7 +28,7 @@ module.exports.isOwner = async (req, res, next) => {
     return res.redirect("/listings");
   }
 
-  if (!listing.owner.equals(res.locals.currUser._id)) {
+  if (!listing.owner || !listing.owner.equals(res.locals.currUser._id)) {
     req.flash("error", "You don't have permission to edit");
     return res.redirect(`/listings/${id}`);
   }
@@ -37,34 +36,36 @@ module.exports.isOwner = async (req, res, next) => {
   next();
 };
 
-
-module.exports. validateListing = (req,res,next)=>{
-let {error}= listingSchema.validate(req.body);
-   console.log(error);
-   if(error){
-    let errmsg= error.details.map((el)=> el.message).join(",");
+module.exports.validateListing = (req, res, next) => {
+  let { error } = listingSchema.validate(req.body);
+  if (error) {
+    let errmsg = error.details.map((el) => el.message).join(",");
     throw new ExpressError(400, errmsg);
-   }else{
+  } else {
     next();
-   }
+  }
 };
 
-module.exports. validateReview = (req,res,next)=>{
-let {error}= reviewSchema.validate(req.body);
-   console.log(error);
-   if(error){
-    let errmsg= error.details.map((el)=> el.message).join(",");
+module.exports.validateReview = (req, res, next) => {
+  let { error } = reviewSchema.validate(req.body);
+  if (error) {
+    let errmsg = error.details.map((el) => el.message).join(",");
     throw new ExpressError(400, errmsg);
-   }else{
+  } else {
     next();
-   }
+  }
 };
 
 module.exports.isReviewAuthor = async (req, res, next) => {
-  let { id, reviewId  } = req.params;
+  let { id, reviewId } = req.params;
   let review = await Review.findById(reviewId);
 
-  if (!review.author.equals(req.currUser._id)) {
+  if (!review) {
+    req.flash("error", "Review not found");
+    return res.redirect(`/listings/${id}`);
+  }
+
+  if (!review.author || !review.author.equals(res.locals.currUser._id)) {
     req.flash("error", "You are not author of this review");
     return res.redirect(`/listings/${id}`);
   }

@@ -1,0 +1,155 @@
+<% layout("./layout/boilerplate") %>
+
+<div class="container-fluid px-lg-5 my-4">
+  <!-- Split Hero Section: Map out your next trip & Interactive Map (Matching Screenshot 2) -->
+  <div class="row g-4 align-items-center mb-5 pb-4 border-bottom">
+    <!-- Left Column: Trips Title, Graphic, Description & Get Started -->
+    <div class="col-lg-5 col-xl-4 pe-lg-4">
+      <h1 class="fw-bold mb-4" style="font-size: 2.2rem;">Trips</h1>
+
+      <div class="text-center text-lg-start my-3">
+        <!-- Travel Illustration Graphic -->
+        <div class="mb-3 d-inline-block">
+          <div class="p-3 bg-light rounded-4 border d-inline-flex align-items-center justify-content-center" style="width: 140px; height: 140px;">
+            <span style="font-size: 4rem;">🗺️</span>
+          </div>
+        </div>
+
+        <h3 class="fw-bold mb-2">Map out your next trip</h3>
+        <p class="text-muted mb-4" style="line-height: 1.5; font-size: 0.95rem;">
+          After you book a trip, experience or service, come back here to see details, explore the map and save places to visit.
+        </p>
+
+        <!-- 'Get started' redirects to home page (/listings) -->
+        <a href="/listings" class="btn btn-brand rounded-pill px-5 py-3 fw-bold fs-6 shadow-sm">
+          Get started
+        </a>
+      </div>
+    </div>
+
+    <!-- Right Column: Interactive Google Map of India (Matching Screenshot 2) -->
+    <div class="col-lg-7 col-xl-8">
+      <div class="rounded-4 overflow-hidden shadow-sm border position-relative" style="height: 480px; background-color: #f7f7f7;">
+        <iframe 
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7529452.923838244!2d72.8777!3d19.0760!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30635ff06b92b791%3A0xd78c4fa1854213a6!2sIndia!5e0!3m2!1sen!2sin!4v1710777600000!5m2!1sen!2sin" 
+          width="100%" 
+          height="100%" 
+          style="border:0;" 
+          allowfullscreen="" 
+          loading="lazy" 
+          referrerpolicy="no-referrer-when-downgrade"
+          title="Destinations Map">
+        </iframe>
+        <div class="position-absolute bottom-0 start-0 m-3 p-2 px-3 rounded-pill bg-white shadow-sm border small fw-semibold">
+          <i class="fa-solid fa-location-dot text-danger me-1"></i> Destinations across India
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookings List Section -->
+  <div class="mb-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h3 class="fw-bold mb-0">Your confirmed bookings</h3>
+      <a href="/listings" class="btn btn-sm btn-outline-dark rounded-pill px-3">
+        <i class="fa-solid fa-compass me-1"></i> Explore More
+      </a>
+    </div>
+  </div>
+
+  <% if(!bookings || bookings.length === 0) { %>
+    <!-- Notice when no active bookings -->
+    <div class="alert alert-light border rounded-4 p-4 text-center mb-5">
+      <p class="text-muted mb-2">You don't have any confirmed bookings yet.</p>
+      <a href="/listings" class="btn btn-outline-danger rounded-pill px-4 btn-sm fw-bold">
+        Find a stay now
+      </a>
+    </div>
+  <% } else { %>
+    <!-- Bookings Grid -->
+    <div class="row g-4">
+      <% for(let booking of bookings) { %>
+        <% if (booking.listing) { %>
+          <div class="col-lg-6">
+            <div class="card h-100 border rounded-4 overflow-hidden shadow-sm hover-lift" style="transition: transform 0.2s ease, box-shadow 0.2s ease;">
+              <div class="row g-0 h-100">
+                <!-- Listing Image -->
+                <div class="col-sm-5 position-relative">
+                  <img 
+                    src="<%= booking.listing.image && booking.listing.image.url ? booking.listing.image.url : 'https://images.unsplash.com/photo-1552733407-5d5c46c3bb3b?auto=format&fit=crop&w=400&q=60' %>" 
+                    alt="<%= booking.listing.title %>"
+                    class="img-fluid h-100 w-100 object-fit-cover"
+                    style="min-height: 220px;"
+                  >
+                  <span class="badge bg-dark bg-opacity-75 text-white position-absolute top-0 start-0 m-3 px-3 py-2 rounded-pill small">
+                    <i class="fa-solid fa-circle-check text-success me-1"></i> <%= booking.status === 'confirmed' ? 'Confirmed' : booking.status %>
+                  </span>
+                </div>
+
+                <!-- Booking Info -->
+                <div class="col-sm-7 p-3 p-md-4 d-flex flex-column justify-content-between">
+                  <div>
+                    <div class="small text-muted mb-1">
+                      <i class="fa-solid fa-location-dot text-danger me-1"></i> <%= booking.listing.location %>, <%= booking.listing.country %>
+                    </div>
+                    <h5 class="fw-bold mb-2 text-truncate-2">
+                      <a href="/listings/<%= booking.listing._id %>" class="text-dark text-decoration-none hover-underline">
+                        <%= booking.listing.title %>
+                      </a>
+                    </h5>
+
+                    <!-- Dates & Guests -->
+                    <div class="bg-light p-2 rounded-3 mb-3 small">
+                      <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted"><i class="fa-regular fa-calendar me-1"></i> Dates:</span>
+                        <span class="fw-semibold">
+                          <%= new Date(booking.checkIn).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) %>
+                          &rarr;
+                          <%= new Date(booking.checkOut).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) %>
+                        </span>
+                      </div>
+                      <div class="d-flex justify-content-between mb-1">
+                        <span class="text-muted"><i class="fa-regular fa-moon me-1"></i> Duration:</span>
+                        <span class="fw-semibold"><%= booking.nights %> night<%= booking.nights > 1 ? 's' : '' %></span>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span class="text-muted"><i class="fa-solid fa-user-group me-1"></i> Guests:</span>
+                        <span class="fw-semibold"><%= booking.guests %> guest<%= booking.guests > 1 ? 's' : '' %></span>
+                      </div>
+                    </div>
+
+                    <!-- Payment & Razorpay Details -->
+                    <div class="border-top pt-2">
+                      <div class="d-flex justify-content-between align-items-baseline mb-2">
+                        <span class="text-muted small">Amount Paid:</span>
+                        <span class="fw-bold text-brand fs-5">&#8377; <%= booking.totalPrice.toLocaleString("en-IN") %></span>
+                      </div>
+
+                      <div class="d-flex flex-wrap align-items-center gap-1 small">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle px-2 py-1">
+                          <i class="fa-solid fa-shield-halved me-1"></i> Razorpay Paid
+                        </span>
+                        <% if(booking.razorpayPaymentId) { %>
+                          <span class="badge bg-light text-secondary border font-monospace" title="Razorpay Payment ID">
+                            ID: <%= booking.razorpayPaymentId %>
+                          </span>
+                        <% } %>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Actions -->
+                  <div class="pt-3 border-top mt-3 d-flex gap-2">
+                    <a href="/listings/<%= booking.listing._id %>" class="btn btn-sm btn-outline-dark rounded-pill flex-grow-1">
+                      View Listing
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      <% } %>
+    </div>
+  <% } %>
+</div>
