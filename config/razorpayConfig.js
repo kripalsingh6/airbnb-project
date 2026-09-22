@@ -1,5 +1,5 @@
-const Razorpay = require("razorpay");
-const crypto = require("crypto");
+import Razorpay from "razorpay";
+import crypto from "crypto";
 
 const keyId = process.env.RAZORPAY_KEY_ID || "rzp_test_placeholder";
 const keySecret = process.env.RAZORPAY_KEY_SECRET || "placeholder_secret";
@@ -26,7 +26,14 @@ function verifyPaymentSignature(orderId, paymentId, signature) {
   return expectedSignature === signature;
 }
 
-module.exports = {
+export {
+  razorpay,
+  keyId,
+  keySecret,
+  verifyPaymentSignature,
+};
+
+export default {
   razorpay,
   keyId,
   keySecret,

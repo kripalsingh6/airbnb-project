@@ -191,7 +191,13 @@ function getAmenitiesForListing(listing) {
   return [...selectedAvailable, ...selectedUnavailable];
 }
 
-module.exports = {
+export {
   ALL_AMENITIES,
   getAmenitiesForListing,
 };
+
+export default {
+  ALL_AMENITIES,
+  getAmenitiesForListing,
+};
+

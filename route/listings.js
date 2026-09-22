@@ -1,12 +1,15 @@
-const express = require("express");
+import express from "express";
+import mongoose from "mongoose";
+import multer from "multer";
+import wrapAsync from "../utils/wrapAsync.js";
+import Listing from "../models/listing.js";
+import { isLoggedIn, isOwner, validateListing } from "../middleware.js";
+import * as listingController from "../controllers/listing.js";
+import { storage } from "../config/cloudConfig.js";
+
 const router = express.Router();
-const wrapAsync = require("../utils/wrapAsync.js");
-const Listing = require("../models/listing.js");
-const { isLoggedIn, isOwner, validateListing } = require("../middleware.js");
-const listingController = require("../controllers/listing.js");
-const multer = require("multer");
-const { storage } = require("../cloudConfig.js");
 const upload = multer({ storage });
+
 
 router.route("/")
   .get(wrapAsync(async (req, res) => {
@@ -24,7 +27,6 @@ router.route("/")
       ];
 
       // Support searching by exact MongoDB ObjectId (_id)
-      const mongoose = require("mongoose");
       if (mongoose.Types.ObjectId.isValid(queryStr) && queryStr.length === 24) {
         orConditions.push({ _id: queryStr });
       }
@@ -128,4 +130,4 @@ router.route("/:id/book")
 router.post("/:id/create-order", isLoggedIn, wrapAsync(listingController.createPaymentOrder));
 router.post("/:id/verify-payment", isLoggedIn, wrapAsync(listingController.verifyPayment));
 
-module.exports = router;
+export default router;

@@ -1,6 +1,8 @@
-const mongoose = require("mongoose");
-const intidata = require("./data.js");
-const Listing = require("../models/listing.js");
+import mongoose from "mongoose";
+import intidata from "./data.js";
+import Listing from "../models/listing.js";
+import User from "../models/user.js";
+import { getAmenitiesForListing } from "../utils/amenitiesHelper.js";
 
 main()
 .then(()=>{
@@ -14,7 +16,6 @@ async function main() {
     await mongoose.connect("mongodb://127.0.0.1:27017/Project");
 };
 
-const User = require("../models/user.js");
 
 const hostProfiles = [
   { username: "Sophia Anderson", email: "sophia@example.com" },
@@ -53,8 +54,6 @@ const initDB = async () => {
   // Also include any other existing users
   const allUsers = await User.find({});
   const hostPool = allUsers.length > 0 ? allUsers : hosts;
-
-const { getAmenitiesForListing } = require("../utils/amenitiesHelper.js");
 
   // Assign different host and unique amenities to each listing
   const initializedListings = intidata.data.map((obj, idx) => ({

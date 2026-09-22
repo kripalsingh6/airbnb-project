@@ -1,12 +1,21 @@
-const { string, required } = require("joi");
-const mongoose= require("mongoose");
+import mongoose from "mongoose";
+import passportLocalMongoosePkg from "passport-local-mongoose";
+
+const passportLocalMongoose = passportLocalMongoosePkg.default || passportLocalMongoosePkg;
 const schema = mongoose.Schema;
-const passportLocalMongoose = require("passport-local-mongoose").default;
 
 const userSchema = new schema({
   email: {
     type: String,
     required: true,
+  },
+  googleId: {
+    type: String,
+    unique: true,
+    sparse: true,
+  },
+  avatar: {
+    type: String,
   },
   firstName: {
     type: String,
@@ -30,4 +39,5 @@ const userSchema = new schema({
 });
 
 userSchema.plugin(passportLocalMongoose);
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+export default User;

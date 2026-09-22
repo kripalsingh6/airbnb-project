@@ -1,5 +1,6 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 const schema = mongoose.Schema;
+
 
 const bookingSchema = new schema({
   listing: {
@@ -71,4 +72,5 @@ const bookingSchema = new schema({
 });
 
 const Booking = mongoose.model("Booking", bookingSchema);
-module.exports = Booking;
+export default Booking;
+

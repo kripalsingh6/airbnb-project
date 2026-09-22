@@ -1,6 +1,6 @@
-const Joi = require("joi");
+import Joi from "joi";
 
-module.exports.listingSchema = Joi.object({
+export const listingSchema = Joi.object({
   listing: Joi.object({
     title: Joi.string().required(),
     description: Joi.string().required(),
@@ -21,9 +21,9 @@ module.exports.listingSchema = Joi.object({
   amenities: Joi.any().optional(),
 });
 
-module.exports.reviewSchema = Joi.object({
+export const reviewSchema = Joi.object({
   review: Joi.object({
     rating: Joi.number().required().min(1).max(5),
     comment: Joi.string().required(),
   }).required(),
-});
+});

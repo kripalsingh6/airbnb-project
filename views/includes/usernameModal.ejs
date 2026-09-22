@@ -1,0 +1,187 @@
+<% if (typeof currUser !== "undefined" && currUser) { %>
+<!-- Username Check & Update Card Modal -->
+<div class="modal fade" id="usernameModal" tabindex="-1" aria-labelledby="usernameModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+    <div class="modal-content username-modal-content border-0 rounded-4 shadow-lg overflow-hidden">
+      <!-- Modal Header -->
+      <div class="username-modal-header p-4 pb-3 border-bottom position-relative">
+        <button type="button" class="btn-close position-absolute top-0 end-0 m-3" data-bs-dismiss="modal" aria-label="Close"></button>
+        <div class="d-flex align-items-center gap-3">
+          <div class="username-avatar-badge rounded-circle d-flex align-items-center justify-content-center shadow-sm">
+            <% if (currUser.avatar) { %>
+              <img src="<%= currUser.avatar %>" alt="<%= currUser.username %>" class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
+            <% } else { %>
+              <i class="fa-solid fa-user-pen fs-5 text-white"></i>
+            <% } %>
+          </div>
+          <div>
+            <h5 class="modal-title fw-bold mb-0 text-dark" id="usernameModalLabel">Welcome to Wanderlust!</h5>
+            <small class="text-muted">Check or customize your unique username</small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="modal-body p-4 pt-3">
+        <p class="small text-muted mb-3" style="line-height: 1.45;">
+          Your username is your unique identity across Wanderlust for bookings, reviews, and hosting. You can keep your assigned username or pick a custom one below.
+        </p>
+
+        <form id="usernameUpdateForm" novalidate>
+          <div class="mb-3">
+            <label for="popupUsernameInput" class="form-label fw-bold small text-dark mb-1">
+              Username
+            </label>
+            <div class="input-group username-input-group">
+              <span class="input-group-text border-end-0 rounded-start-3 fw-bold text-muted">
+                @
+              </span>
+              <input 
+                type="text" 
+                class="form-control border-start-0 rounded-end-3 fw-semibold ps-1" 
+                id="popupUsernameInput" 
+                name="username" 
+                value="<%= currUser.username %>" 
+                placeholder="Enter username" 
+                minlength="3" 
+                maxlength="30" 
+                required
+                autocomplete="off"
+              >
+            </div>
+            <div class="d-flex justify-content-between align-items-center mt-1 px-1">
+              <span class="text-muted small" style="font-size: 0.75rem;" id="usernameRuleHint">
+                3–30 characters, letters &amp; numbers
+              </span>
+              <span class="badge bg-light text-dark border small" id="usernameCharCounter" style="font-size: 0.7rem;">
+                <%= currUser.username ? currUser.username.length : 0 %>/30
+              </span>
+            </div>
+          </div>
+
+          <!-- Alert box for errors or success -->
+          <div id="usernameModalAlert" class="alert py-2 px-3 small rounded-3 d-none mb-3"></div>
+
+          <!-- Buttons -->
+          <div class="d-flex flex-column gap-2 mt-4">
+            <button type="submit" id="btnSaveUsername" class="btn btn-brand w-100 py-2 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2">
+              <i class="fa-solid fa-check"></i>
+              <span>Save &amp; Continue</span>
+            </button>
+            <button type="button" class="btn btn-outline-secondary w-100 py-2 fw-semibold rounded-3 border" data-bs-dismiss="modal">
+              Keep current (<span class="curr-user-display-name"><%= currUser.username %></span>)
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if (typeof showUsernamePrompt !== 'undefined' && showUsernamePrompt) { %>
+<script>
+  window.__AUTO_POP_USERNAME_MODAL = true;
+</script>
+<% } %>
+
+<script>
+(function() {
+  function initUsernameModal() {
+    const modalEl = document.getElementById('usernameModal');
+    if (!modalEl) return;
+
+    // Auto-pop after signup
+    if (window.__AUTO_POP_USERNAME_MODAL && typeof bootstrap !== 'undefined') {
+      try {
+        const bsModal = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: true });
+        bsModal.show();
+      } catch (e) {
+        console.error("Auto pop username modal error:", e);
+      }
+    }
+
+    const form = document.getElementById('usernameUpdateForm');
+    const input = document.getElementById('popupUsernameInput');
+    const charCounter = document.getElementById('usernameCharCounter');
+    const alertBox = document.getElementById('usernameModalAlert');
+    const submitBtn = document.getElementById('btnSaveUsername');
+
+    if (!form || !input) return;
+
+    input.addEventListener('input', function() {
+      const len = this.value.trim().length;
+      if (charCounter) charCounter.textContent = `${len}/30`;
+      if (alertBox) alertBox.classList.add('d-none');
+    });
+
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const newUsername = input.value.trim();
+
+      if (!newUsername || newUsername.length < 3) {
+        showAlert('Username must be at least 3 characters long.', 'danger');
+        return;
+      }
+      if (newUsername.length > 30) {
+        showAlert('Username cannot exceed 30 characters.', 'danger');
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Saving...';
+
+      try {
+        const res = await fetch('/user/update-username', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({ username: newUsername })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data.success) {
+          showAlert(data.message || 'Failed to update username. Please try another.', 'danger');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Save &amp; Continue</span>';
+        } else {
+          showAlert('Username updated successfully!', 'success');
+          submitBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Saved!';
+
+          // Update any username displays on the page
+          document.querySelectorAll('.curr-user-display-name').forEach(el => {
+            el.textContent = data.username;
+          });
+
+          setTimeout(() => {
+            if (typeof bootstrap !== 'undefined') {
+              const modalInstance = bootstrap.Modal.getInstance(modalEl);
+              if (modalInstance) modalInstance.hide();
+            }
+          }, 800);
+        }
+      } catch (err) {
+        showAlert('Network error occurred. Please try again.', 'danger');
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<i class="fa-solid fa-check"></i> <span>Save &amp; Continue</span>';
+      }
+    });
+
+    function showAlert(msg, type) {
+      if (!alertBox) return;
+      alertBox.className = `alert alert-${type} py-2 px-3 small rounded-3 mb-3`;
+      alertBox.textContent = msg;
+      alertBox.classList.remove('d-none');
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUsernameModal);
+  } else {
+    initUsernameModal();
+  }
+})();
+</script>
+<% } %>

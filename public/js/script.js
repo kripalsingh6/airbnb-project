@@ -278,6 +278,9 @@
         if (inVal && outVal) {
           segWhenText.textContent = formatDateRange(inVal, outVal);
           segWhenText.classList.add('has-val');
+        } else if (inVal) {
+          segWhenText.textContent = formatSingleDate(inVal) + ' – ...';
+          segWhenText.classList.add('has-val');
         } else {
           segWhenText.textContent = 'Add dates';
           segWhenText.classList.remove('has-val');
@@ -285,70 +288,170 @@
       }
     }
 
+    function formatSingleDate(dStr) {
+      if (!dStr) return '';
+      const d = new Date(dStr);
+      if (isNaN(d.getTime())) return dStr;
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+      return `${d.getDate()} ${months[d.getMonth()]}`;
+    }
+
+    // ============================================================
+    // Single Unified Calendar Engine: First click = Check-in, Second = Checkout
+    // ============================================================
+    const singleCalGrid = document.getElementById('singleCalGrid');
+    const calMonthYearTitle = document.getElementById('calMonthYearTitle');
+    const calPrevMonthBtn = document.getElementById('calPrevMonthBtn');
+    const calNextMonthBtn = document.getElementById('calNextMonthBtn');
+    const calStepBadge = document.getElementById('calStepBadge');
+
+    let currentCalDate = new Date();
+    if (popoverCheckInInput && popoverCheckInInput.value) {
+      const parsed = new Date(popoverCheckInInput.value);
+      if (!isNaN(parsed.getTime())) currentCalDate = parsed;
+    }
+
+    const monthNames = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    function renderCalendar() {
+      if (!singleCalGrid) return;
+      singleCalGrid.innerHTML = '';
+
+      const year = currentCalDate.getFullYear();
+      const month = currentCalDate.getMonth();
+
+      if (calMonthYearTitle) {
+        calMonthYearTitle.textContent = `${monthNames[month]} ${year}`;
+      }
+
+      const firstDayIndex = new Date(year, month, 1).getDay();
+      const totalDays = new Date(year, month + 1, 0).getDate();
+
+      // Empty padding cells before first day
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement('span');
+        emptyCell.className = 'cal-day-cell empty';
+        singleCalGrid.appendChild(emptyCell);
+      }
+
+      const curIn = popoverCheckInInput ? popoverCheckInInput.value : '';
+      const curOut = popoverCheckOutInput ? popoverCheckOutInput.value : '';
+
+      for (let day = 1; day <= totalDays; day++) {
+        const cell = document.createElement('span');
+        cell.className = 'cal-day-cell';
+        const dStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        cell.setAttribute('data-date', dStr);
+        cell.textContent = day;
+
+        if (dStr === curIn || dStr === curOut) {
+          cell.classList.add('selected');
+        } else if (curIn && curOut && dStr > curIn && dStr < curOut) {
+          cell.classList.add('in-range');
+        }
+
+        cell.addEventListener('click', () => handleDateClick(dStr));
+        singleCalGrid.appendChild(cell);
+      }
+
+      updateStepBadge();
+    }
+
+    function updateStepBadge() {
+      if (!calStepBadge) return;
+      const curIn = popoverCheckInInput ? popoverCheckInInput.value : '';
+      const curOut = popoverCheckOutInput ? popoverCheckOutInput.value : '';
+
+      if (!curIn) {
+        calStepBadge.textContent = 'Step 1: Select check-in date';
+        calStepBadge.className = 'badge rounded-pill bg-light text-dark border px-3 py-1';
+      } else if (!curOut) {
+        calStepBadge.textContent = `Step 2: Select checkout date (after ${formatSingleDate(curIn)})`;
+        calStepBadge.className = 'badge rounded-pill bg-danger-subtle text-danger border border-danger-subtle px-3 py-1';
+      } else {
+        calStepBadge.textContent = `${formatDateRange(curIn, curOut)}`;
+        calStepBadge.className = 'badge rounded-pill bg-dark text-white border px-3 py-1';
+      }
+    }
+
+    function handleDateClick(dateStr) {
+      const curIn = popoverCheckInInput ? popoverCheckInInput.value : '';
+      const curOut = popoverCheckOutInput ? popoverCheckOutInput.value : '';
+
+      // First click: no checkin set, or both already set -> start fresh with new checkin
+      if (!curIn || (curIn && curOut)) {
+        if (popoverCheckInInput) popoverCheckInInput.value = dateStr;
+        if (popoverCheckOutInput) popoverCheckOutInput.value = '';
+        updateDateSelection();
+        renderCalendar();
+        return;
+      }
+
+      // Second click: checkin is set, now picking checkout
+      if (curIn && !curOut) {
+        const d1 = new Date(curIn);
+        const d2 = new Date(dateStr);
+
+        if (d2 > d1) {
+          if (popoverCheckOutInput) popoverCheckOutInput.value = dateStr;
+          updateDateSelection();
+          renderCalendar();
+
+          // Progress to Who popover automatically
+          setTimeout(() => {
+            openPopover(segWho, whoPopover);
+          }, 350);
+        } else {
+          // Clicked earlier or equal date: reset checkin to clicked date
+          if (popoverCheckInInput) popoverCheckInInput.value = dateStr;
+          if (popoverCheckOutInput) popoverCheckOutInput.value = '';
+          updateDateSelection();
+          renderCalendar();
+        }
+      }
+    }
+
+    // Month Navigation Controls
+    if (calPrevMonthBtn) {
+      calPrevMonthBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentCalDate.setMonth(currentCalDate.getMonth() - 1);
+        renderCalendar();
+      });
+    }
+
+    if (calNextMonthBtn) {
+      calNextMonthBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        currentCalDate.setMonth(currentCalDate.getMonth() + 1);
+        renderCalendar();
+      });
+    }
+
     if (popoverCheckInInput) {
       popoverCheckInInput.addEventListener('change', () => {
-        const d1 = new Date(popoverCheckInInput.value);
-        const d2 = new Date(popoverCheckOutInput.value);
-        if (d2 <= d1) {
-          const next = new Date(d1);
-          next.setDate(next.getDate() + 2);
-          popoverCheckOutInput.value = next.toISOString().split('T')[0];
-        }
         updateDateSelection();
+        if (popoverCheckInInput.value) {
+          const parsed = new Date(popoverCheckInInput.value);
+          if (!isNaN(parsed.getTime())) currentCalDate = parsed;
+        }
+        renderCalendar();
       });
     }
 
     if (popoverCheckOutInput) {
       popoverCheckOutInput.addEventListener('change', () => {
         updateDateSelection();
+        renderCalendar();
       });
     }
 
-    // Calendar Day click interaction
-    let calClickStep = 0; // 0 = picking start, 1 = picking end
-    const calDays = document.querySelectorAll('.cal-day-cell:not(.empty)');
-    calDays.forEach(cell => {
-      cell.addEventListener('click', () => {
-        const dateStr = cell.getAttribute('data-date');
-        if (!dateStr) return;
-
-        if (calClickStep === 0) {
-          if (popoverCheckInInput) popoverCheckInInput.value = dateStr;
-          // Temporarily set checkout 2 days after
-          const d1 = new Date(dateStr);
-          const d2 = new Date(d1);
-          d2.setDate(d2.getDate() + 2);
-          if (popoverCheckOutInput) popoverCheckOutInput.value = d2.toISOString().split('T')[0];
-          calClickStep = 1;
-        } else {
-          const d1 = new Date(popoverCheckInInput.value);
-          const clicked = new Date(dateStr);
-          if (clicked > d1) {
-            if (popoverCheckOutInput) popoverCheckOutInput.value = dateStr;
-          } else {
-            if (popoverCheckInInput) popoverCheckInInput.value = dateStr;
-          }
-          calClickStep = 0;
-          // Progress to Who popover (Airbnb style)
-          openPopover(segWho, whoPopover);
-        }
-
-        // Highlight cells visually
-        const curIn = popoverCheckInInput ? popoverCheckInInput.value : '';
-        const curOut = popoverCheckOutInput ? popoverCheckOutInput.value : '';
-        calDays.forEach(c => {
-          const cDate = c.getAttribute('data-date');
-          c.classList.remove('selected', 'in-range');
-          if (cDate === curIn || cDate === curOut) {
-            c.classList.add('selected');
-          } else if (cDate > curIn && cDate < curOut) {
-            c.classList.add('in-range');
-          }
-        });
-
-        updateDateSelection();
-      });
-    });
+    // Initialize calendar
+    renderCalendar();
+    updateDateSelection();
 
     // Flexible Date Chips
     const flexChips = document.querySelectorAll('.date-flex-chip');
@@ -524,6 +627,11 @@
       });
 
       userDropdownMenu.addEventListener('click', (e) => {
+        // Prevent theme selector clicks from bubbling or closing the menu
+        if (e.target.closest('#themeSelectorContainer')) {
+          e.stopPropagation();
+          return;
+        }
         // Allow links and buttons to be clicked, stop other clicks from bubbling
         if (e.target.tagName !== 'A' && !e.target.closest('a') && e.target.tagName !== 'BUTTON' && !e.target.closest('button')) {
           e.stopPropagation();
@@ -552,6 +660,8 @@
   function initThemeController() {
     const themeOptLight = document.getElementById('themeOptLight');
     const themeOptDark = document.getElementById('themeOptDark');
+    const themeOptionsGroup = document.getElementById('themeOptionsGroup');
+    const themeHeaderRow = document.getElementById('themeHeaderRow');
     const currentThemeBadge = document.getElementById('currentThemeBadge');
     const navThemeToggleBtn = document.getElementById('navThemeToggleBtn');
     const navThemeIcon = document.getElementById('navThemeIcon');
@@ -566,9 +676,9 @@
       if (currentThemeBadge) {
         currentThemeBadge.textContent = isDark ? 'Dark Mode' : 'White Mode';
         if (isDark) {
-          currentThemeBadge.className = 'badge rounded-pill bg-dark text-white border border-secondary';
+          currentThemeBadge.className = 'badge rounded-pill bg-dark text-white border border-secondary px-2 py-1';
         } else {
-          currentThemeBadge.className = 'badge rounded-pill bg-danger-subtle text-danger';
+          currentThemeBadge.className = 'badge rounded-pill bg-danger-subtle text-danger border-0 px-2 py-1';
         }
       }
       if (navThemeIcon) {
@@ -595,29 +705,56 @@
     const currentTheme = document.documentElement.getAttribute('data-theme') || 
       (function () { try { return localStorage.getItem('wanderlust_theme'); } catch (e) { return 'light'; } })() || 
       'light';
-    syncThemeUI(currentTheme === 'dark');
+    setTheme(currentTheme);
 
-    if (themeOptLight) {
-      themeOptLight.addEventListener('click', (e) => {
+    // Instant click handler helper to prevent delayed/ghost clicks
+    function bindInstantAction(elem, action) {
+      if (!elem) return;
+      elem.addEventListener('click', (e) => {
+        e.preventDefault();
         e.stopPropagation();
-        setTheme('light');
+        action();
       });
     }
 
-    if (themeOptDark) {
-      themeOptDark.addEventListener('click', (e) => {
+    // 1. One-click on White mode button
+    bindInstantAction(themeOptLight, () => setTheme('light'));
+
+    // 2. One-click on Dark mode button
+    bindInstantAction(themeOptDark, () => setTheme('dark'));
+
+    // 3. One-click on the Appearance header row or badge to toggle
+    bindInstantAction(themeHeaderRow, () => {
+      const currentIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      setTheme(currentIsDark ? 'light' : 'dark');
+    });
+
+    bindInstantAction(currentThemeBadge, () => {
+      const currentIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      setTheme(currentIsDark ? 'light' : 'dark');
+    });
+
+    // 4. One-click on the options capsule
+    if (themeOptionsGroup) {
+      themeOptionsGroup.addEventListener('click', (e) => {
         e.stopPropagation();
-        setTheme('dark');
+        const clickedBtn = e.target.closest('.theme-btn-option');
+        if (clickedBtn) {
+          const val = clickedBtn.getAttribute('data-theme-val');
+          if (val) setTheme(val);
+        } else {
+          const rect = themeOptionsGroup.getBoundingClientRect();
+          const clickX = e.clientX - rect.left;
+          setTheme(clickX < rect.width / 2 ? 'light' : 'dark');
+        }
       });
     }
 
-    if (navThemeToggleBtn) {
-      navThemeToggleBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const currentIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        setTheme(currentIsDark ? 'light' : 'dark');
-      });
-    }
+    // 5. Navbar quick toggle button
+    bindInstantAction(navThemeToggleBtn, () => {
+      const currentIsDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      setTheme(currentIsDark ? 'light' : 'dark');
+    });
   }
 
   function initApp() {

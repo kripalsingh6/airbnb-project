@@ -1,8 +1,10 @@
-const Listing = require("../models/listing.js");
-const Booking = require("../models/booking.js");
-const { getAmenitiesForListing } = require("../utils/amenitiesHelper.js");
+import Listing from "../models/listing.js";
+import Booking from "../models/booking.js";
+import { getAmenitiesForListing } from "../utils/amenitiesHelper.js";
+import { razorpay, keyId, verifyPaymentSignature } from "../config/razorpayConfig.js";
 
-module.exports.index = async (req, res) => {
+export const index = async (req, res) => {
+
   let { id } = req.params;
   const listing = await Listing.findById(id)
     .populate({ path: "reviews", populate: { path: "author" } })
@@ -49,11 +51,11 @@ module.exports.index = async (req, res) => {
   });
 };
 
-module.exports.renderNewform = (req, res) => {
+export const renderNewform = (req, res) => {
   res.render("./listings/new.ejs");
 };
 
-module.exports.Newlisting = async (req, res, next) => {
+export const Newlisting = async (req, res, next) => {
   const listingData = { ...req.body.listing };
 
   // Parse amenities from form submission if present
@@ -91,7 +93,7 @@ module.exports.Newlisting = async (req, res, next) => {
   res.redirect(`/listings/${newListing._id}`);
 };
 
-module.exports.renderEditForm = async (req, res) => {
+export const renderEditForm = async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id);
   if (!listing) {
@@ -105,7 +107,7 @@ module.exports.renderEditForm = async (req, res) => {
   res.render("./listings/edit.ejs", { listing, originalImage });
 };
 
-module.exports.editListing = async (req, res) => {
+export const editListing = async (req, res) => {
   let { id } = req.params;
   const updateData = { ...req.body.listing };
 
@@ -140,14 +142,14 @@ module.exports.editListing = async (req, res) => {
   return res.redirect(`/listings/${id}`);
 };
 
-module.exports.Deletelisting = async (req, res) => {
+export const Deletelisting = async (req, res) => {
   let { id } = req.params;
   await Listing.findByIdAndDelete(id);
   req.flash("success", "Listing deleted successfully!");
   res.redirect("/listings");
 };
 
-module.exports.renderBookForm = async (req, res) => {
+export const renderBookForm = async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id).populate("owner");
   if (!listing) {
@@ -200,7 +202,7 @@ module.exports.renderBookForm = async (req, res) => {
   });
 };
 
-module.exports.createBooking = async (req, res) => {
+export const createBooking = async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id);
   if (!listing) {
@@ -252,9 +254,8 @@ module.exports.createBooking = async (req, res) => {
   res.redirect(`/bookings`);
 };
 
-const { razorpay, keyId, verifyPaymentSignature } = require("../razorpayConfig.js");
+export const createPaymentOrder = async (req, res) => {
 
-module.exports.createPaymentOrder = async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id);
   if (!listing) {
@@ -316,7 +317,7 @@ module.exports.createPaymentOrder = async (req, res) => {
   });
 };
 
-module.exports.verifyPayment = async (req, res) => {
+export const verifyPayment = async (req, res) => {
   let { id } = req.params;
   const listing = await Listing.findById(id);
   if (!listing) {

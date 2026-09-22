@@ -227,90 +227,32 @@
               </div>
             </div>
 
-            <!-- Visual Calendar Grid (September 2026 / October 2026) -->
-            <div class="row text-center mb-3">
-              <div class="col-6">
-                <div class="fw-bold mb-2 small">September 2026</div>
-                <div class="d-flex justify-content-between text-muted small fw-semibold mb-1"
-                  style="font-size: 0.72rem;">
-                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                </div>
-                <div class="d-grid" style="grid-template-columns: repeat(7, 1fr); gap: 2px;">
-                  <span class="cal-day-cell empty"></span><span class="cal-day-cell empty"></span>
-                  <span class="cal-day-cell" data-date="2026-09-01">1</span>
-                  <span class="cal-day-cell" data-date="2026-09-02">2</span>
-                  <span class="cal-day-cell" data-date="2026-09-03">3</span>
-                  <span class="cal-day-cell" data-date="2026-09-04">4</span>
-                  <span class="cal-day-cell" data-date="2026-09-05">5</span>
-                  <span class="cal-day-cell" data-date="2026-09-06">6</span>
-                  <span class="cal-day-cell" data-date="2026-09-07">7</span>
-                  <span class="cal-day-cell" data-date="2026-09-08">8</span>
-                  <span class="cal-day-cell" data-date="2026-09-09">9</span>
-                  <span class="cal-day-cell" data-date="2026-09-10">10</span>
-                  <span class="cal-day-cell" data-date="2026-09-11">11</span>
-                  <span class="cal-day-cell" data-date="2026-09-12">12</span>
-                  <span class="cal-day-cell" data-date="2026-09-13">13</span>
-                  <span class="cal-day-cell" data-date="2026-09-14">14</span>
-                  <span class="cal-day-cell" data-date="2026-09-15">15</span>
-                  <span class="cal-day-cell" data-date="2026-09-16">16</span>
-                  <span class="cal-day-cell" data-date="2026-09-17">17</span>
-                  <span class="cal-day-cell selected" data-date="2026-09-18">18</span>
-                  <span class="cal-day-cell in-range" data-date="2026-09-19">19</span>
-                  <span class="cal-day-cell selected" data-date="2026-09-20">20</span>
-                  <span class="cal-day-cell" data-date="2026-09-21">21</span>
-                  <span class="cal-day-cell" data-date="2026-09-22">22</span>
-                  <span class="cal-day-cell" data-date="2026-09-23">23</span>
-                  <span class="cal-day-cell" data-date="2026-09-24">24</span>
-                  <span class="cal-day-cell" data-date="2026-09-25">25</span>
-                  <span class="cal-day-cell" data-date="2026-09-26">26</span>
-                  <span class="cal-day-cell" data-date="2026-09-27">27</span>
-                  <span class="cal-day-cell" data-date="2026-09-28">28</span>
-                  <span class="cal-day-cell" data-date="2026-09-29">29</span>
-                  <span class="cal-day-cell" data-date="2026-09-30">30</span>
-                </div>
+            <!-- Visual Calendar (Single Clean Calendar with Step Selection) -->
+            <div class="calendar-single-container mb-3">
+              <!-- Calendar Month Header with Prev/Next Navigation -->
+              <div class="d-flex align-items-center justify-content-between mb-2 px-1">
+                <button type="button" class="btn btn-sm btn-light rounded-circle cal-nav-btn" id="calPrevMonthBtn" title="Previous month" style="width: 32px; height: 32px; padding: 0;">
+                  <i class="fa-solid fa-chevron-left small"></i>
+                </button>
+                <div class="fw-bold fs-6" id="calMonthYearTitle">September 2026</div>
+                <button type="button" class="btn btn-sm btn-light rounded-circle cal-nav-btn" id="calNextMonthBtn" title="Next month" style="width: 32px; height: 32px; padding: 0;">
+                  <i class="fa-solid fa-chevron-right small"></i>
+                </button>
               </div>
 
-              <div class="col-6">
-                <div class="fw-bold mb-2 small">October 2026</div>
-                <div class="d-flex justify-content-between text-muted small fw-semibold mb-1"
-                  style="font-size: 0.72rem;">
-                  <span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span>
-                </div>
-                <div class="d-grid" style="grid-template-columns: repeat(7, 1fr); gap: 2px;">
-                  <span class="cal-day-cell empty"></span><span class="cal-day-cell empty"></span><span
-                    class="cal-day-cell empty"></span><span class="cal-day-cell empty"></span>
-                  <span class="cal-day-cell" data-date="2026-10-01">1</span>
-                  <span class="cal-day-cell" data-date="2026-10-02">2</span>
-                  <span class="cal-day-cell" data-date="2026-10-03">3</span>
-                  <span class="cal-day-cell" data-date="2026-10-04">4</span>
-                  <span class="cal-day-cell" data-date="2026-10-05">5</span>
-                  <span class="cal-day-cell" data-date="2026-10-06">6</span>
-                  <span class="cal-day-cell" data-date="2026-10-07">7</span>
-                  <span class="cal-day-cell" data-date="2026-10-08">8</span>
-                  <span class="cal-day-cell" data-date="2026-10-09">9</span>
-                  <span class="cal-day-cell" data-date="2026-10-10">10</span>
-                  <span class="cal-day-cell" data-date="2026-10-11">11</span>
-                  <span class="cal-day-cell" data-date="2026-10-12">12</span>
-                  <span class="cal-day-cell" data-date="2026-10-13">13</span>
-                  <span class="cal-day-cell" data-date="2026-10-14">14</span>
-                  <span class="cal-day-cell" data-date="2026-10-15">15</span>
-                  <span class="cal-day-cell" data-date="2026-10-16">16</span>
-                  <span class="cal-day-cell" data-date="2026-10-17">17</span>
-                  <span class="cal-day-cell" data-date="2026-10-18">18</span>
-                  <span class="cal-day-cell" data-date="2026-10-19">19</span>
-                  <span class="cal-day-cell" data-date="2026-10-20">20</span>
-                  <span class="cal-day-cell" data-date="2026-10-21">21</span>
-                  <span class="cal-day-cell" data-date="2026-10-22">22</span>
-                  <span class="cal-day-cell" data-date="2026-10-23">23</span>
-                  <span class="cal-day-cell" data-date="2026-10-24">24</span>
-                  <span class="cal-day-cell" data-date="2026-10-25">25</span>
-                  <span class="cal-day-cell" data-date="2026-10-26">26</span>
-                  <span class="cal-day-cell" data-date="2026-10-27">27</span>
-                  <span class="cal-day-cell" data-date="2026-10-28">28</span>
-                  <span class="cal-day-cell" data-date="2026-10-29">29</span>
-                  <span class="cal-day-cell" data-date="2026-10-30">30</span>
-                  <span class="cal-day-cell" data-date="2026-10-31">31</span>
-                </div>
+              <!-- Helper instruction / step indicator -->
+              <div class="text-center mb-2" id="calStepInstruction" style="font-size: 0.8rem; font-weight: 600;">
+                <span class="badge rounded-pill bg-light text-dark border px-3 py-1" id="calStepBadge">Step 1: Select check-in date</span>
+              </div>
+
+              <!-- Day Names Header -->
+              <div class="d-grid text-muted fw-semibold mb-1 text-center" style="grid-template-columns: repeat(7, 1fr); font-size: 0.75rem;">
+                <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+              </div>
+
+              <!-- Dynamic Days Grid -->
+              <div id="singleCalGrid" class="d-grid" style="grid-template-columns: repeat(7, 1fr); gap: 3px;">
+                <!-- Populated dynamically via JS -->
               </div>
             </div>
 
@@ -407,155 +349,150 @@
         </a>
 
         <!-- Quick Dark/Light Theme Button -->
-        <button class="nav-link px-2 d-none d-md-flex align-items-center justify-content-center btn-theme-toggle border-0 bg-transparent" id="navThemeToggleBtn" title="Toggle Dark/Light Mode" type="button" style="cursor: pointer; width: 38px; height: 38px; border-radius: 50%;">
+        <button class="nav-link px-2 d-flex align-items-center justify-content-center btn-theme-toggle border-0 bg-transparent" id="navThemeToggleBtn" title="Toggle Dark/Light Mode" type="button" style="cursor: pointer; width: 38px; height: 38px; border-radius: 50%;">
           <i class="fa-solid fa-moon fs-5" id="navThemeIcon"></i>
         </button>
+
 
         <a class="nav-link px-2 d-none d-md-block text-dark" href="#" title="Language &amp; Currency"
           onclick="alert('Languages &amp; Currency: English (IN) · ₹ INR'); return false;">
           <i class="fa-solid fa-globe"></i>
         </a>
 
-        <!-- User Profile Pill & Right Dropdown Menu (Exact match to Screenshot) -->
+        <!-- User Profile Pill & Right Dropdown Menu (Only when logged in) -->
+        <% if (typeof currUser !== "undefined" && currUser) { %>
         <div class="user-menu-container position-relative">
           <button
             class="user-profile-menu-pill d-flex align-items-center gap-2 border rounded-pill bg-white px-2 py-1 shadow-sm"
             type="button" id="userProfileMenuBtn" aria-expanded="false" aria-haspopup="true" title="Account Menu">
             <i class="fa-solid fa-bars text-secondary small ms-1"></i>
             <span class="user-avatar-circle">
-              <%= currUser ? currUser.username.charAt(0).toUpperCase() : '👤' %>
+              <%= currUser.username.charAt(0).toUpperCase() %>
             </span>
           </button>
 
           <!-- Floating Right Dropdown Menu (Drops at Right Side with Perfect Motion) -->
           <div class="right-dropdown-menu shadow-lg" id="userDropdownMenu" role="menu">
-            <% if (currUser) { %>
-              <div class="menu-user-header px-3 py-2 border-bottom mb-1">
-                <div class="fw-bold text-truncate">
-                  <%= currUser.username %>
-                </div>
-                <small class="text-muted text-truncate d-block">
-                  <%= currUser.email || 'Member' %>
-                </small>
+            <div class="menu-user-header px-3 py-2 border-bottom mb-1">
+              <div class="fw-bold text-truncate curr-user-display-name">
+                <%= currUser.username %>
               </div>
-              <% } %>
+              <small class="text-muted text-truncate d-block">
+                <%= currUser.email || "Member" %>
+              </small>
+            </div>
 
-                <!-- Section 1: Core Navigation -->
-                <a href="/wishlists" class="menu-drop-item">
-                  <i class="fa-regular fa-heart me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Wishlists</span>
-                  <span class="badge bg-danger rounded-pill ms-auto" id="menuWishlistBadge"
-                    style="<%= (typeof wishlistIds !== 'undefined' && wishlistIds && wishlistIds.length > 0) ? '' : 'display: none;' %>">
-                    <%= typeof wishlistIds !=='undefined' && wishlistIds ? wishlistIds.length : 0 %>
-                  </span>
-                </a>
+            <!-- Section 1: Travel & Experiences -->
+            <a href="/bookings" class="menu-drop-item">
+              <i class="fa-solid fa-suitcase-rolling me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Trips &amp; Bookings</span>
+            </a>
 
-                <a href="/bookings" class="menu-drop-item">
-                  <i class="fa-solid fa-suitcase-rolling me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Trips</span>
-                </a>
+            <a href="/wishlists" class="menu-drop-item">
+              <i class="fa-regular fa-heart me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Wishlists</span>
+              <span class="badge bg-danger rounded-pill ms-auto" id="menuWishlistBadge"
+                style="<%= (typeof wishlistIds !== 'undefined' && wishlistIds && wishlistIds.length > 0) ? '' : 'display: none;' %>">
+                <%= typeof wishlistIds !=='undefined' && wishlistIds ? wishlistIds.length : 0 %>
+              </span>
+            </a>
 
-                <a href="#" class="menu-drop-item" onclick="alert('Messages feature coming soon!'); return false;">
-                  <i class="fa-regular fa-comment-dots me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Messages</span>
-                </a>
+            <a href="#" class="menu-drop-item" onclick="alert('Messages feature coming soon!'); return false;">
+              <i class="fa-regular fa-comment-dots me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Messages</span>
+            </a>
 
-                <a href="#" class="menu-drop-item"
-                  onclick="alert('Profile details: <%= currUser ? currUser.username : 'Guest' %>'); return false;">
-                  <i class="fa-regular fa-circle-user me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Profile</span>
-                </a>
+            <a href="#" class="menu-drop-item" data-bs-toggle="modal" data-bs-target="#usernameModal">
+              <i class="fa-regular fa-circle-user me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Profile &amp; Username (<span class="curr-user-display-name"><%= currUser.username %></span>)</span>
+            </a>
 
-                <div class="menu-divider"></div>
+            <div class="menu-divider"></div>
 
-                <!-- Theme Mode Options (White mode & Dark mode) -->
-                <div class="px-3 py-2 my-1 border-bottom" id="themeSelectorContainer">
-                  <div class="d-flex align-items-center justify-content-between mb-2">
-                    <span class="small fw-semibold text-muted text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px;">Appearance</span>
-                    <span class="badge rounded-pill bg-danger-subtle text-danger" id="currentThemeBadge" style="font-size: 0.7rem; font-weight: 600;">White Mode</span>
-                  </div>
-                  <div class="theme-options-group d-flex p-1 rounded-pill" style="background: var(--bg-light); border: 1px solid var(--border-color);">
-                    <button type="button" class="theme-btn-option flex-fill border-0 rounded-pill py-1 px-2 d-flex align-items-center justify-content-center gap-1 active" id="themeOptLight" data-theme-val="light" title="Switch to White Mode">
-                      <i class="fa-solid fa-sun text-warning small"></i>
-                      <span class="small fw-bold">White mode</span>
-                    </button>
-                    <button type="button" class="theme-btn-option flex-fill border-0 rounded-pill py-1 px-2 d-flex align-items-center justify-content-center gap-1" id="themeOptDark" data-theme-val="dark" title="Switch to Dark Mode">
-                      <i class="fa-solid fa-moon text-primary small"></i>
-                      <span class="small fw-bold">Dark mode</span>
-                    </button>
-                  </div>
-                </div>
+            <!-- Theme Mode Options (White mode & Dark mode) -->
+            <div class="px-3 py-2 my-1 border-bottom" id="themeSelectorContainer">
+              <div class="d-flex align-items-center justify-content-between mb-2" id="themeHeaderRow" style="cursor: pointer;" title="Click to toggle theme mode">
+                <span class="small fw-semibold text-muted text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.5px; user-select: none;">Appearance</span>
+                <button type="button" class="badge rounded-pill bg-danger-subtle text-danger border-0 px-2 py-1" id="currentThemeBadge" style="font-size: 0.7rem; font-weight: 600; cursor: pointer;" title="Click to toggle theme">White Mode</button>
+              </div>
+              <div class="theme-options-group d-flex p-1 rounded-pill" id="themeOptionsGroup" style="cursor: pointer;">
+                <button type="button" class="theme-btn-option flex-fill border-0 rounded-pill py-1 px-2 d-flex align-items-center justify-content-center gap-1 active" id="themeOptLight" data-theme-val="light" title="Switch to White Mode">
+                  <i class="fa-solid fa-sun text-warning small" style="pointer-events: none;"></i>
+                  <span class="small fw-bold" style="pointer-events: none;">White mode</span>
+                </button>
+                <button type="button" class="theme-btn-option flex-fill border-0 rounded-pill py-1 px-2 d-flex align-items-center justify-content-center gap-1" id="themeOptDark" data-theme-val="dark" title="Switch to Dark Mode">
+                  <i class="fa-solid fa-moon text-primary small" style="pointer-events: none;"></i>
+                  <span class="small fw-bold" style="pointer-events: none;">Dark mode</span>
+                </button>
+              </div>
+            </div>
 
-                <!-- Section 2: Account Utilities -->
-                <a href="#" class="menu-drop-item" onclick="alert('No notifications right now'); return false;">
-                  <i class="fa-regular fa-bell me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Notifications</span>
-                </a>
+            <!-- Section 2: Account Utilities -->
+            <a href="#" class="menu-drop-item" onclick="alert('No notifications right now'); return false;">
+              <i class="fa-regular fa-bell me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Notifications</span>
+            </a>
 
-                <a href="#" class="menu-drop-item" onclick="alert('Account settings'); return false;">
-                  <i class="fa-solid fa-gear me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Account settings</span>
-                </a>
+            <a href="#" class="menu-drop-item" onclick="alert('Account settings'); return false;">
+              <i class="fa-solid fa-gear me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Account settings</span>
+            </a>
 
-                <a href="#" class="menu-drop-item"
-                  onclick="alert('Languages & Currency: English (IN) · ₹ INR'); return false;">
-                  <i class="fa-solid fa-globe me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Languages &amp; currency</span>
-                </a>
+            <a href="#" class="menu-drop-item"
+              onclick="alert('Languages & Currency: English (IN) · ₹ INR'); return false;">
+              <i class="fa-solid fa-globe me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Languages &amp; currency</span>
+            </a>
 
-                <a href="#" class="menu-drop-item"
-                  onclick="alert('Help Centre: Contact support 24/7 at support@wanderlust.com'); return false;">
-                  <i class="fa-regular fa-circle-question me-3 text-muted menu-item-icon"></i>
-                  <span class="menu-item-text">Help Centre</span>
-                </a>
+            <a href="#" class="menu-drop-item"
+              onclick="alert('Help Centre: Contact support 24/7 at support@wanderlust.com'); return false;">
+              <i class="fa-regular fa-circle-question me-3 text-muted menu-item-icon"></i>
+              <span class="menu-item-text">Help Centre</span>
+            </a>
 
-                <div class="menu-divider"></div>
+            <div class="menu-divider"></div>
 
-                <!-- Section 3: Become a host promo card -->
-                <a href="/listings/new"
-                  class="menu-host-promo text-decoration-none d-flex align-items-center justify-content-between p-3 mx-2 my-1 rounded-3">
-                  <div>
-                    <div class="fw-bold text-dark small">Become a host</div>
-                    <div class="text-muted" style="font-size: 0.76rem; line-height: 1.2;">It's easy to start hosting and
-                      earn extra income.</div>
-                  </div>
-                  <i class="fa-solid fa-house-chimney text-danger fs-4 ms-2"></i>
-                </a>
+            <!-- Section 3: Become a host promo card -->
+            <a href="/listings/new"
+              class="menu-host-promo text-decoration-none d-flex align-items-center justify-content-between p-3 mx-2 my-1 rounded-3">
+              <div>
+                <div class="fw-bold text-dark small">Become a host</div>
+                <div class="text-muted" style="font-size: 0.76rem; line-height: 1.2;">It's easy to start hosting and
+                  earn extra income.</div>
+              </div>
+              <i class="fa-solid fa-house-chimney text-danger fs-4 ms-2"></i>
+            </a>
 
-                <div class="menu-divider"></div>
+            <div class="menu-divider"></div>
 
-                <!-- Section 4: Referral Links -->
-                <a href="/listings/new" class="menu-drop-item">
-                  <span class="menu-item-text">Refer a host</span>
-                </a>
-                <a href="/listings" class="menu-drop-item">
-                  <span class="menu-item-text">Find a co-host</span>
-                </a>
+            <!-- Section 4: Referral Links -->
+            <a href="/listings/new" class="menu-drop-item">
+              <span class="menu-item-text">Refer a host</span>
+            </a>
+            <a href="/listings" class="menu-drop-item">
+              <span class="menu-item-text">Find a co-host</span>
+            </a>
 
-                <div class="menu-divider"></div>
+            <div class="menu-divider"></div>
 
-                <!-- Section 5: Authentication / Get Started -->
-                <% if (currUser) { %>
-                  <a href="/logout" class="menu-drop-item text-danger fw-semibold">
-                    <i class="fa-solid fa-arrow-right-from-bracket me-3 menu-item-icon"></i>
-                    <span class="menu-item-text">Log out</span>
-                  </a>
-                  <% } else { %>
-                    <a href="/signup" class="menu-drop-item fw-bold text-dark">
-                      <span class="menu-item-text">Sign up</span>
-                    </a>
-                    <a href="/login" class="menu-drop-item">
-                      <span class="menu-item-text">Log in</span>
-                    </a>
-                    <div class="px-3 pt-2 pb-1">
-                      <a href="/listings"
-                        class="btn btn-brand btn-sm w-100 text-center text-white fw-semibold rounded-pill py-2">
-                        Get started
-                      </a>
-                    </div>
-                    <% } %>
+            <!-- Section 5: Authentication / Log out -->
+            <a href="/logout" class="menu-drop-item text-danger fw-semibold">
+              <i class="fa-solid fa-arrow-right-from-bracket me-3 menu-item-icon"></i>
+              <span class="menu-item-text">Log out</span>
+            </a>
           </div>
         </div>
+        <% } else { %>
+        <!-- When Not Logged In: Show Log in directly in header instead of menubar -->
+        <div class="d-flex align-items-center gap-2" id="headerAuthNav">
+          <a href="/signup" class="nav-link fw-semibold px-3 py-1 rounded-pill btn-header-signup">
+            Sign up
+          </a>
+          <a href="/login" class="btn btn-brand btn-sm rounded-pill px-3 py-1 fw-bold text-white shadow-sm btn-header-login">
+            Log in
+          </a>
+        </div>
+        <% } %>
       </div>
     </div>
   </div>

@@ -1,8 +1,9 @@
-const express = require("express");
+import express from "express";
+import wrapAsync from "../utils/wrapAsync.js";
+import { isLoggedIn, validateReview, isReviewAuthor } from "../middleware.js";
+import * as ReviewController from "../controllers/reviews.js";
+
 const router = express.Router({ mergeParams: true });
-const wrapAsync = require("../utils/wrapAsync.js");
-const { isLoggedIn, validateReview, isReviewAuthor } = require("../middleware.js");
-const ReviewController = require("../controllers/reviews.js");
 
 // create review
 router.post(
@@ -20,4 +21,4 @@ router.delete(
   wrapAsync(ReviewController.DeleteReview)
 );
 
-module.exports = router;
+export default router;

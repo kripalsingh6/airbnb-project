@@ -1,11 +1,14 @@
-const express= require("express");
-const router= express.Router();
+import express from "express";
+import passport from "passport";
+import wrapAsync from "../utils/wrapAsync.js";
+import Booking from "../models/booking.js";
+import User from "../models/user.js";
+import Listing from "../models/listing.js";
+import { savedRedirectUrl, isLoggedIn } from "../middleware.js";
+import * as UserController from "../controllers/users.js";
 
-const wrapAsync = require("../utils/wrapAsync");
-const passport = require("passport");
-const Booking = require("../models/booking.js");
-const { savedRedirectUrl, isLoggedIn } = require("../middleware.js");
-const UserController = require("../controllers/users.js");
+const router = express.Router();
+
 
 router.route("/signup")
   .get(UserController.RenderSignup)
@@ -19,11 +22,31 @@ router.route("/login")
     UserController.CreateLogin
   );
 
+// Google OAuth Routes
+router.get(
+  "/auth/google",
+  (req, res, next) => {
+    if (!process.env.GOOGLE_CLIENT_ID || process.env.GOOGLE_CLIENT_ID === "your_google_client_id_here") {
+      req.flash("error", "Google OAuth credentials are not configured in .env yet. Please add GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET.");
+      return res.redirect("/login");
+    }
+    next();
+  },
+  passport.authenticate("google", { scope: ["profile", "email"], prompt: "select_account" })
+);
+
+router.get(
+  "/auth/google/callback",
+  savedRedirectUrl,
+  passport.authenticate("google", { failureRedirect: "/login", failureFlash: true }),
+  UserController.GoogleCallback
+);
+
 // logout
 router.get("/logout", UserController.Logout);
 
-const User = require("../models/user.js");
-const Listing = require("../models/listing.js");
+// Update Username
+router.post("/user/update-username", isLoggedIn, wrapAsync(UserController.UpdateUsername));
 
 // My Bookings / Trips
 router.get("/bookings", isLoggedIn, wrapAsync(async (req, res) => {
@@ -79,4 +102,4 @@ router.post("/wishlists/toggle/:id", wrapAsync(async (req, res) => {
   res.json({ success: true, isLiked, count: user.wishlist.length });
 }));
 
-module.exports = router;
+export default router;
